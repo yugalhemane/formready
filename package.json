@@ -14,7 +14,8 @@
     "test:payments": "node --test tools/payments.test.js",
     "test:accounts": "node --test tools/accounts.test.js",
     "test:account-ui": "node tools/test-account-ui.mjs",
-    "test:documents": "node tools/test-document-tools.mjs"
+    "test:documents": "node tools/test-document-tools.mjs",
+    "test:routes": "node tools/test-routes.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

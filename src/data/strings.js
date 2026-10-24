@@ -62,3 +62,7 @@ Object.assign(strings.hi, { documentSuiteTitle:'PDF और फोटो के �
 Object.assign(strings.en, { darkMode:'Dark mode', lightMode:'Light mode' });
 Object.assign(strings.mr, { darkMode:'डार्क मोड', lightMode:'लाईट मोड' });
 Object.assign(strings.hi, { darkMode:'डार्क मोड', lightMode:'लाइट मोड' });
+
+Object.assign(strings.en, { adminPrivacyNote:'This dashboard shows account, payment and access records only. Application files are processed on each device and are not available to the owner.', adminPageLabel:'Page', previousPage:'Previous', nextPage:'Next', adminActivity:'Admin activity', noAdminActivity:'No owner actions recorded.', auditGrant:'Access granted', auditRevoke:'Access revoked' });
+Object.assign(strings.mr, { adminPrivacyNote:'या डॅशबोर्डवर खाते, पेमेंट आणि वापराची माहिती दिसते. अर्जाच्या फाईल वापरकर्त्याच्या डिव्हाइसवरच तयार होतात; त्या मालकाला दिसत नाहीत.', adminPageLabel:'पान', previousPage:'मागील', nextPage:'पुढील', adminActivity:'मालकाच्या कृती', noAdminActivity:'मालकाची कोणतीही कृती नोंदलेली नाही.', auditGrant:'वापराची परवानगी दिली', auditRevoke:'वापराची परवानगी काढली' });
+Object.assign(strings.hi, { adminPrivacyNote:'इस डैशबोर्ड में खाता, भुगतान और पहुँच की जानकारी दिखती है। आवेदन की फाइलें उपयोगकर्ता के डिवाइस पर रहती हैं और मालिक उन्हें नहीं देख सकता।', adminPageLabel:'पृष्ठ', previousPage:'पिछला', nextPage:'अगला', adminActivity:'मालिक की गतिविधि', noAdminActivity:'मालिक की कोई कार्रवाई दर्ज नहीं है।', auditGrant:'पहुँच दी गई', auditRevoke:'पहुँच रद्द की गई' });

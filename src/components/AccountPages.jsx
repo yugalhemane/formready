@@ -24,17 +24,46 @@ export function AccountPage({ user, session, supabase, t }) {
 }
 
 export function AdminPage({ user, session, t }) {
-  const [users, setUsers] = useState([]), [query, setQuery] = useState(''), [email, setEmail] = useState(''), [plan, setPlan] = useState('examPack'), [reason, setReason] = useState(''), [message, setMessage] = useState('');
-  async function load(q = query) {
+  const [users, setUsers] = useState([]), [events, setEvents] = useState([]), [query, setQuery] = useState(''), [email, setEmail] = useState(''), [plan, setPlan] = useState('examPack'), [reason, setReason] = useState(''), [message, setMessage] = useState(''), [page, setPage] = useState(0), [hasMore, setHasMore] = useState(false), [busy, setBusy] = useState(false);
+  async function load(q = query, targetPage = page) {
     if (!session?.access_token) return;
-    const response = await fetch(`/api/admin/users?q=${encodeURIComponent(q)}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-    const body = await response.json(); setMessage(response.ok ? '' : t[`error_${body.error}`] || t.adminActionError); if (response.ok) setUsers(body.users || []);
+    setBusy(true);
+    try {
+      const response = await fetch(`/api/admin/users?q=${encodeURIComponent(q)}&page=${targetPage}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+      const body = await response.json();
+      setMessage(response.ok ? '' : t[`error_${body.error}`] || t.adminActionError);
+      if (response.ok) { setUsers(body.users || []); setPage(body.page || 0); setHasMore(Boolean(body.hasMore)); }
+    } catch { setMessage(t.adminActionError); }
+    finally { setBusy(false); }
   }
-  useEffect(() => { load(''); }, [session?.access_token]);
+  async function loadEvents() {
+    if (!session?.access_token) return;
+    try {
+      const response = await fetch('/api/admin/audit', { headers: { Authorization: `Bearer ${session.access_token}` } });
+      const body = await response.json();
+      if (response.ok) setEvents(body.events || []);
+    } catch { setMessage(t.adminActionError); }
+  }
+  useEffect(() => { load('', 0); loadEvents(); }, [session?.access_token]);
   async function mutate(method, payload) {
-    const response = await fetch('/api/admin/entitlements', { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` }, body: JSON.stringify({ ...payload, reason }) });
-    const body = await response.json(); setMessage(response.ok ? t.adminSaved : t[`error_${body.error}`] || t.adminActionError); if (response.ok) await load();
+    if (!reason.trim() || (method === 'POST' && !email.trim()) || busy) return;
+    setBusy(true); setMessage('');
+    try {
+      const response = await fetch('/api/admin/entitlements', { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` }, body: JSON.stringify({ ...payload, reason }) });
+      const body = await response.json();
+      setMessage(response.ok ? t.adminSaved : t[`error_${body.error}`] || t.adminActionError);
+      if (response.ok) { if (method === 'POST') setEmail(''); setReason(''); await load(); await loadEvents(); }
+    } catch { setMessage(t.adminActionError); }
+    finally { setBusy(false); }
   }
   if (!user) return <main className="container account-page"><section className="card"><h1>{t.adminTitle}</h1><p>{t.adminSignIn}</p><Link to="/account">{t.signInTitle}</Link></section></main>;
-  return <main className="container account-page"><section className="card"><h1>{t.adminTitle}</h1><p>{t.adminDescription}</p><div className="admin-search"><input className="form-control" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t.searchUsers}/><button className="secondary btn btn-outline-secondary" onClick={()=>load()}>{t.search}</button></div><div className="admin-grant"><h2>{t.grantAccess}</h2><input className="form-control" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder={t.emailAddress}/><select className="form-select" value={plan} onChange={e=>setPlan(e.target.value)}><option value="examPack">{t.examPack} · 24h</option><option value="seasonPass">{t.seasonPass} · 60d</option></select><input className="form-control" value={reason} onChange={e=>setReason(e.target.value)} placeholder={t.reasonRequired}/><button className="primary btn btn-warning" onClick={()=>mutate('POST',{email,plan})}>{t.grantAccess}</button></div>{message&&<p role="status">{message}</p>}{users.map(account=><article className="admin-user" key={account.user_id}><h2>{account.full_name||account.email}</h2><p>{account.email} · {new Date(account.created_at).toLocaleDateString()}</p><h3>{t.paymentHistory}</h3>{account.orders.map((order,i)=><p key={i}>{order.plan} · ₹{order.amount/100} · {order.status}</p>)}<h3>{t.yourAccess}</h3>{account.entitlements.map(item=><p key={item.id}>{item.plan} · {item.status} · {new Date(item.expires_at).toLocaleString()} {item.status==='active'&&<button className="btn btn-sm btn-outline-danger" onClick={()=>mutate('DELETE',{id:item.id})}>{t.revokeAccess}</button>}</p>)}</article>)}</section></main>;
+  return <main className="container account-page"><section className="card">
+    <h1>{t.adminTitle}</h1><p>{t.adminDescription}</p><p className="admin-privacy-note">{t.adminPrivacyNote}</p>
+    <div className="admin-search"><input className="form-control" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t.searchUsers}/><button className="secondary btn btn-outline-secondary" disabled={busy} onClick={()=>load(query,0)}>{t.search}</button></div>
+    <div className="admin-pagination"><button className="btn btn-outline-secondary" disabled={busy||page===0} onClick={()=>load(query,page-1)}>{t.previousPage}</button><span>{t.adminPageLabel} {page+1}</span><button className="btn btn-outline-secondary" disabled={busy||!hasMore} onClick={()=>load(query,page+1)}>{t.nextPage}</button></div>
+    <form className="admin-grant" onSubmit={event=>{event.preventDefault();mutate('POST',{email,plan})}}><h2>{t.grantAccess}</h2><input className="form-control" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder={t.emailAddress} required/><select className="form-select" value={plan} onChange={e=>setPlan(e.target.value)}><option value="examPack">{t.examPack} · 24h</option><option value="seasonPass">{t.seasonPass} · 60d</option></select><input className="form-control" value={reason} onChange={e=>setReason(e.target.value)} placeholder={t.reasonRequired} required/><button className="primary btn btn-warning" disabled={busy||!email.trim()||!reason.trim()} type="submit">{busy?t.processing:t.grantAccess}</button></form>
+    {message&&<p role="status">{message}</p>}
+    {users.map(account=><article className="admin-user" key={account.user_id}><h2>{account.full_name||account.email}</h2><p>{account.email} · {new Date(account.created_at).toLocaleDateString()}</p><h3>{t.paymentHistory}</h3>{account.orders.map((order,i)=><p key={i}>{order.plan} · ₹{order.amount/100} · {order.status}</p>)}{!account.orders.length&&<p>{t.noPayments}</p>}<h3>{t.yourAccess}</h3>{account.entitlements.map(item=><p key={item.id}>{item.plan} · {item.status} · {new Date(item.expires_at).toLocaleString()} {item.status==='active'&&<button className="btn btn-sm btn-outline-danger" disabled={busy||!reason.trim()} onClick={()=>mutate('DELETE',{id:item.id})}>{t.revokeAccess}</button>}</p>)}{!account.entitlements.length&&<p>{t.noAccess}</p>}</article>)}
+    <section className="admin-audit"><h2>{t.adminActivity}</h2>{events.length?events.map((event,i)=><article className="account-record" key={`${event.created_at}-${i}`}><strong>{event.action==='grant'?t.auditGrant:t.auditRevoke}</strong><p>{event.reason}</p><small>{new Date(event.created_at).toLocaleString()} · {event.subject_user_id}</small></article>):<p>{t.noAdminActivity}</p>}</section>
+  </section></main>;
 }

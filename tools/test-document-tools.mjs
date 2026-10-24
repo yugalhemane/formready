@@ -15,6 +15,9 @@ try {
   await page.goto('http://127.0.0.1:5196/tool/pdf');
   await page.getByRole('button', { name: 'Dark mode' }).click();
   if (await page.locator('html').getAttribute('data-theme') !== 'dark') throw new Error('Dark mode did not activate');
+  const darkPages = [['/', 'dark-home-1440.jpg'], ['/tool/ibps', 'dark-tool-1440.jpg'], ['/exam-pack', 'dark-pack-1440.jpg'], ['/privacy-policy', 'dark-legal-1440.jpg']];
+  for (const [route, shot] of darkPages) { await page.goto(`http://127.0.0.1:5196${route}`); await page.screenshot({ path: `test-shots/${shot}`, fullPage: true, type: 'jpeg', quality: 65 }); }
+  await page.goto('http://127.0.0.1:5196/tool/pdf');
   await page.reload();
   if (await page.locator('html').getAttribute('data-theme') !== 'dark') throw new Error('Dark mode did not persist on reload');
   await page.screenshot({ path: 'test-shots/dark-mode-1440.jpg', fullPage: true, type: 'jpeg', quality: 65 });

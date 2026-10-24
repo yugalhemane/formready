@@ -7,6 +7,7 @@ import accessHandler from '../api/payments/access.js';
 import webhookHandler from '../api/payments/webhook.js';
 import adminUsersHandler from '../api/admin/users.js';
 import adminEntitlementsHandler from '../api/admin/entitlements.js';
+import adminAuditHandler from '../api/admin/audit.js';
 
 process.env.RAZORPAY_KEY_ID = 'rzp_test_accounts';
 process.env.RAZORPAY_KEY_SECRET = 'razorpay-test-secret';
@@ -113,6 +114,32 @@ test('owner pass grant and revoke use atomic audited database functions', async 
   assert.equal(grant.statusCode,200); assert.equal(calls[0].payload.p_actor,uid); assert.equal(calls[0].payload.p_reason,'UPI transfer checked');
   const revoke=response(); await adminEntitlementsHandler({method:'DELETE',headers:authHeader,body:{id:'e3b1d364-8e95-4b1c-9974-027c94c85082',reason:'Refunded'}},revoke);
   assert.equal(revoke.statusCode,200); assert.equal(revoke.data.revoked,true); assert.equal(calls[1].payload.p_entitlement,'e3b1d364-8e95-4b1c-9974-027c94c85082');
+});
+
+test('owner user search paginates account records and reports whether more exist', async () => {
+  process.env.ADMIN_USER_IDS=uid;
+  globalThis.fetch=async url=>{
+    const u=String(url); if(u.endsWith('/auth/v1/user'))return new Response(JSON.stringify({id:uid,email:'owner@example.com'}));
+    if(u.includes('/rest/v1/profiles?')){assert.match(u,/limit=51&offset=50/);return new Response(JSON.stringify([{user_id:uid,email:'buyer@example.com',full_name:'Buyer',created_at:new Date().toISOString()}]));}
+    if(u.includes('/rest/v1/orders?')||u.includes('/rest/v1/entitlements?'))return new Response('[]');
+    throw new Error(`unexpected fetch ${url}`);
+  };
+  const res=response(); await adminUsersHandler({method:'GET',headers:authHeader,query:{page:'1'}},res);
+  assert.equal(res.statusCode,200); assert.equal(res.data.page,1); assert.equal(res.data.hasMore,false);
+});
+
+test('owner audit endpoint returns recent administrative actions and blocks non-admins', async () => {
+  process.env.ADMIN_USER_IDS=uid;
+  globalThis.fetch=async url=>{
+    const u=String(url); if(u.endsWith('/auth/v1/user'))return new Response(JSON.stringify({id:uid,email:'owner@example.com'}));
+    if(u.includes('/rest/v1/admin_audit?'))return new Response(JSON.stringify([{action:'grant',reason:'UPI verified'}]));
+    throw new Error(`unexpected fetch ${url}`);
+  };
+  const allowed=response(); await adminAuditHandler({method:'GET',headers:authHeader},allowed);
+  assert.equal(allowed.statusCode,200); assert.equal(allowed.data.events[0].reason,'UPI verified');
+  globalThis.fetch=async()=>new Response(JSON.stringify({id:'00000000-0000-4000-8000-000000000000',email:'buyer@example.com'}));
+  const denied=response(); await adminAuditHandler({method:'GET',headers:authHeader},denied);
+  assert.equal(denied.statusCode,403); assert.equal(denied.data.error,'admin_required');
 });
 
 test('non-admin account cannot access owner endpoints', async () => {
