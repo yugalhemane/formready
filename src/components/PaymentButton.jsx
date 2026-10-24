@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { track } from '../lib/analytics';
+import { config } from '../config';
+import UpiPayment from './UpiPayment';
 
 const checkoutUrl = 'https://checkout.razorpay.com/v1/checkout.js';
 function loadCheckout() {
@@ -70,5 +72,6 @@ export default function PaymentButton({ plan, t, setUnlock, onSuccess, className
       {busy ? t.paymentWorking : enabled ? t.payNow : t.paymentNotConfigured}
     </button>
     {message && <p role="status" className="payment-message">{message}</p>}
+    <UpiPayment price={config.prices[plan]} plan={plan} t={t} />
   </div>;
 }
