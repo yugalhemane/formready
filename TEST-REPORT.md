@@ -1,8 +1,10 @@
-# Prompt E completion report
+# FormReady QA and completion report
 
 Date: 2026-10-24
 
-## Guide word counts (rendered guide body)
+## Guides
+
+The eight owner-supplied guides are rendered verbatim below their spec tables and tools. Counts were measured from rendered guide content with `node tools/count-guide-words.mjs`.
 
 | Preset page | Words |
 |---|---:|
@@ -15,47 +17,37 @@ Date: 2026-10-24
 | MPSC | 362 |
 | MahaDBT | 395 |
 
-The supplied `GUIDES-CONTENT.md` text is rendered verbatim below each preset's spec table and tool. Counts are from `node tools/count-guide-words.mjs` against the rendered guide page content.
+## Translations
 
-## Translation audit
+- Locale maps contain 171 EN and 171 MR keys. The complete per-string audit is in `TRANSLATION-AUDIT.md`.
+- 168 user-interface strings are bilingual. Three legal bodies remain English with Marathi summaries; eight supplied guide bodies remain English verbatim as requested.
+- Language persistence and first paint pass. Marathi Playwright screens pass for home, IBPS tool, paid Pack, and pricing; legal page UI chrome is also checked. Screenshots: `test-shots/mr-home.png`, `mr-tool.png`, `mr-pack.png`, and `mr-pricing.png`.
 
-- Files scanned: `src/App.jsx`, `src/components/HomePage.jsx`, `src/components/ExamPack.jsx`, `src/components/CroppableTool.jsx`, `src/components/CropDialog.jsx`, `src/components/AdSlot.jsx`, `src/components/Seo.jsx`, `src/data/presets.js`, `src/data/strings.js`, `src/data/guides.json`.
-- Found: 151 distinct UI string-map entries plus 8 supplied guide bodies (159 audited content units).
-- Moved: 148 UI strings to the bilingual strings map; guide text remains English verbatim by explicit owner instruction.
-- Exceptions: 3 English legal bodies, each preceded by a Marathi summary; 8 verbatim English guides; proper nouns, exam names, units, formats, and owner-approved glossary terms.
-- First paint and localStorage persistence: PASS. `node tools/test-mr-ui.mjs` passed for home, IBPS tool, unlocked Pack, and pricing; screenshots: `test-shots/mr-home.png`, `mr-tool.png`, `mr-pack.png`, `mr-pricing.png`.
-- Audit table: `TRANSLATION-AUDIT.md`. Every mapped row is marked moved; legal-body rows give the permitted exception reason.
+## Payments
 
-## GA4 intercepted collect evidence
+Razorpay Standard Checkout is wired through Vercel Functions at `api/payments/order.js`, `verify.js`, and `access.js`.
 
-One Playwright session accepted consent using `G-TESTFORMREADY`, used the single-file tool, unlocked the Pack, and downloaded the ZIP. The GA endpoint batched the three app events into a single POST collect request. Captured request:
+- The server creates orders using the fixed prices in `site.config.json`; it ignores client-submitted amounts.
+- The server checks Razorpay's checkout signature, retrieves the order and payment from Razorpay, compares plan, amount and currency, and grants access only after the payment is captured.
+- It issues a signed access token. The expiry is fixed to Razorpay's payment timestamp, so resending an old payment callback cannot extend access.
+- Exam Pack costs ₹49 for 24 hours; Season Pass costs ₹99 for 60 days. Both are one-time purchases. The Shop Plan is disabled until its multi-user service is available.
+- A payment token is stored in the purchasing browser. There are no accounts or cross-device recovery.
+- `npm run test:payments`: **5 passed**, covering fixed order pricing, signature checks, captured-only access, token tampering, and replayed expired payments.
+- `npm run test:browser`: **PASS**. Playwright simulates Razorpay Checkout and the payment API; it makes no real charge. It verifies paid access survives reload, ads are hidden for an active purchase, and the full image flow and ZIP still work.
 
-```text
-POST https://www.google-analytics.com/g/collect?v=2&tid=G-TESTFORMREADY&…
-Body:
-en=tool_used&_ee=1&ep.kind=image&ep.transport_type=beacon&…
-en=pack_unlocked&_ee=1&ep.transport_type=beacon&…
-en=zip_downloaded&_ee=1&ep.exam=ibps&ep.transport_type=beacon&…
-```
+**Live payment status: not configured.** A Razorpay merchant account and keys are required before the button can accept real payments. Set these in Vercel: `VITE_RAZORPAY_KEY_ID` (public key ID), `RAZORPAY_KEY_ID` (same ID), `RAZORPAY_KEY_SECRET` (server-only), and `PACK_TOKEN_SECRET` (new random server-only signing secret). Start with Test Mode keys and complete a test payment before setting activated Live Mode keys. The app build and payment code are ready, but no account-specific credentials were supplied.
 
-The test intercepted the request before aborting it and asserted all three `en` values. Full URL and body are preserved in `test-shots/browser-results.json`. `rg "gtag\\(" src` finds only initialization/configuration in `ConsentScripts.jsx`; all app events use the shared queued `track()` helper.
+## Existing feature regressions
 
-## Regression
+- Production build: **PASS**. Main JS 356.33 KB (111.75 KB gzip); JSZip 95.93 KB; PDF tools 420.90 KB; pdf.js 430.17 KB; worker 1,264.34 KB; HEIC 1,352.13 KB. PDF and HEIC remain lazy-loaded. The worker and HEIC chunks trigger Vite's large-chunk warning.
+- Single image: **PASS**, IBPS crop output 200×230 px / 27.8 KB.
+- IBPS Pack: **PASS**, 4/4 checklist rows pass. ZIP entries are `photo.jpg`, `signature.jpg`, `thumb.jpg`, and `declaration.jpg`; sizes 29.0, 10.0, 35.3, and 99.6 KB. Full results: `test-shots/browser-results.json`.
+- PDF: **PASS**, generated three-page 11,899.9 KB source compresses to 130.6 KB at the 200 KB target. At an impossible 1 KB target, the UI reports the best result, 6.7 KB. Evidence: `test-shots/pdf-results.json` and `node tools/test-pdf-compression.js`.
+- Declined consent: **PASS**, image processing works with no ad/analytics scripts or page errors.
+- Responsive screenshots at 360, 768 and 1440 px: **PASS**, home and tool pages inspected. No overlap/stretching found; see `test-shots/home-*.jpg` and `test-shots/tool-*.jpg`.
 
-- Production build: PASS. `npm run build`; generated 18 route sitemap entries. Main JS 349.90 KB (110.18 KB gzip); JSZip 95.93 KB; PDF tools 420.90 KB; pdf.js 430.17 KB; PDF worker 1,264.34 KB; HEIC 1,352.13 KB. HEIC/PDF remain lazy chunks. The build reports expected large lazy worker/HEIC chunk warnings.
-- IBPS single-file crop/process: PASS, 200×230 px, 27.8 KB (20–50 KB).
-- IBPS Pack: PASS, 4/4 actual output checklist rows pass; ZIP contains `photo.jpg`, `signature.jpg`, `thumb.jpg`, `declaration.jpg`; measured sizes are 29.0, 10.0, 35.3, and 99.6 KB. Evidence: `test-shots/browser-results.json`.
-- PDF: PASS. Three-page generated 11,899.9 KB source reached 130.6 KB at 200 KB target; impossible 1 KB target reports best 6.7 KB and explicitly states target was 1 KB. Evidence: `test-shots/pdf-results.json`; reproduced with `node tools/test-pdf-compression.js`.
-- Consent declined: PASS; image flow completes, no ad/tracking slots or scripts, zero page errors.
-- GA events: PASS; same-session intercepted collect POST includes `tool_used`, `pack_unlocked`, `zip_downloaded`.
-- Responsive screenshots: PASS, inspected home and tool at 360, 768 and 1440 px; no overlap or stretching. Files: `test-shots/home-{360,768,1440}.jpg`, `test-shots/tool-{360,768,1440}.jpg`.
-- Marathi screenshots / persistence: PASS (four screenshot files listed above).
+## Owner setup remaining
 
-## Owner checklist
-
-- Set real site domain and AdSense publisher/ad-slot IDs in the single site/env config.
-- Set production GA4 measurement ID in deployment environment.
-- Set UPI and WhatsApp contact values in config.
-- Deploy static `dist/` to Vercel and verify the production domain/ads.txt before submitting to AdSense.
-
-Ready to deploy
+1. Activate the Razorpay merchant account and set the four payment environment variables above in Vercel. Test with Test Mode first, then replace with activated Live Mode keys.
+2. Set the actual WhatsApp contact number. Configure GA4 and AdSense only if you want those services enabled.
+3. Redeploy after setting Vercel environment variables.

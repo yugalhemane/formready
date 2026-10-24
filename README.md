@@ -1,6 +1,6 @@
 # FormReady
 
-Static Vite + React app. Image and PDF work runs in the browser; there is no application backend.
+FormReady is a Vite + React application. Image and PDF processing runs in the browser. Vercel Functions handle paid access verification; uploaded documents are never sent to those functions.
 
 ## Local development
 
@@ -10,19 +10,30 @@ npm run dev
 npm run build
 ```
 
-The production output is `dist`. Deploy it as a Vite static site on Vercel with build command `npm run build` and output directory `dist`.
+For the payment endpoints, install/log in to the Vercel CLI and run `vercel dev`; plain `vite` serves the frontend only. The production output is `dist`.
 
-## Owner configuration
+## Deploy and configure payments
 
-- Set the site domain, UPI ID, WhatsApp number, and prices in [site.config.json](site.config.json). `npm run build` generates `public/sitemap.xml`, `public/robots.txt`, and `public/ads.txt` from this file and the route list.
-- Copy `.env.example` to `.env.local`. Add the optional GA4 ID and AdSense client plus all six ad unit IDs. Scripts only load after consent is accepted. The ads.txt publisher ID belongs in `site.config.json`.
-- Set `VITE_PACK_SECRET` at build time. Generate today's V1 pack code locally with `PACK_SECRET=your-secret node tools/generate-code.js` (PowerShell: `$env:PACK_SECRET='your-secret'; node tools/generate-code.js`). Codes are an honour-system gate; the secret is embedded in the static JavaScript and is not secure payment enforcement.
-- UPI QR currently remains a placeholder; setting the UPI ID alone does not generate a real QR image.
+Deploy as a Vite static site on Vercel with build command `npm run build` and output directory `dist`. The app is configured for `https://formready-xi.vercel.app` in `site.config.json`.
 
-## Tests and test assets
+Create and activate a Razorpay merchant account. Start with Razorpay Test Mode keys and set these Vercel environment variables for Preview:
 
-- `npm run test:assets` creates the sample photo, signature, certificate scan, and three-page PDF in `test-assets/` using `sharp` and `pdf-lib`.
-- `npm run test:browser` runs Playwright against local Chrome. Set `CHROME_PATH` if Chrome is not installed at the default Windows path. It captures the home and IBPS tool at 360, 768, and 1440 pixels and runs the single-image and IBPS Pack flows.
-- `node tools/test-pdf-compression.js` checks PDF targets and page preservation.
+- `VITE_RAZORPAY_KEY_ID`: public Checkout key ID (the `rzp_test_...` or `rzp_live_...` value).
+- `RAZORPAY_KEY_ID`: same key ID, used by the server function.
+- `RAZORPAY_KEY_SECRET`: server-only key secret. Never prefix it with `VITE_`.
+- `PACK_TOKEN_SECRET`: a new, long random server-only value used to sign access tokens.
 
-See [TEST-REPORT.md](TEST-REPORT.md) for the latest build, browser, PDF, translation, and analytics evidence. Before deployment, set the owner-specific domain, publisher, analytics, payment, and contact configuration described above.
+After successful test transactions, switch to approved Live Mode keys and set them for Production. Redeploy after changing environment variables. Enable the payment methods you want in the Razorpay account. Never commit `.env.local` or server secrets.
+
+Exam Pack is a one-time ₹49 purchase for 24 hours. Season Pass is a one-time ₹99 purchase for 60 days. A captured payment is verified against Razorpay before access is issued. A signed token is saved in the purchasing browser; there is no account or cross-device purchase recovery. The Shop Plan is not available to purchase while its multi-user features are unfinished.
+
+Update the domain, WhatsApp number, prices, and AdSense publisher ID in `site.config.json`. Copy `.env.example` to `.env.local` for local environment-variable names. Set optional GA4, AdSense, and ad-unit IDs in Vercel only if you intend to enable them. Consent still gates analytics and ads.
+
+## Checks
+
+- `npm run test:payments` tests fixed server-side pricing, Razorpay signature and captured-payment validation, and tamper-resistant access tokens.
+- `npm run test:browser` exercises crop/process, mocked hosted checkout, Pack unlock, ZIP download, GA events, declined consent, and responsive screenshots.
+- `node tools/test-pdf-compression.js` checks PDF compression targets and page preservation.
+- `npm run test:assets` generates the local image and PDF fixtures using `sharp` and `pdf-lib`.
+
+See [TEST-REPORT.md](TEST-REPORT.md) for the app's prior feature evidence. Live payment processing remains disabled until Razorpay credentials are configured in Vercel.

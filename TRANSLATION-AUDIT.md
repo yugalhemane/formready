@@ -2,7 +2,7 @@
 
 Audited with a repo-wide `rg -n` pass for JSX text, placeholders, button/label copy, errors, empty states, navigation, consent, pricing, and legal summaries, followed by component review. Locale is read synchronously from `localStorage` in the first React render. The Marathi Playwright run verifies home, tool, unlocked Pack and pricing screens with English chrome absent except the approved glossary, language name, technical file formats, and proper nouns.
 
-Files reviewed: `src/App.jsx`, `src/components/HomePage.jsx`, `src/components/ExamPack.jsx`, `src/components/CroppableTool.jsx`, `src/components/CropDialog.jsx`, `src/components/AdSlot.jsx`, `src/components/Seo.jsx`, `src/data/presets.js`, `src/data/strings.js`, and `src/data/guides.json`.
+Files reviewed: `src/App.jsx`, `src/components/HomePage.jsx`, `src/components/ExamPack.jsx`, `src/components/CroppableTool.jsx`, `src/components/CropDialog.jsx`, `src/components/AdSlot.jsx`, `src/components/PaymentButton.jsx`, `src/components/Seo.jsx`, `src/data/presets.js`, `src/data/strings.js`, and `src/data/guides.json`.
 
 | File | String | i18n key | EN | MR | Status |
 |---|---|---|---|---|---|
@@ -113,7 +113,7 @@ Files reviewed: `src/App.jsx`, `src/components/HomePage.jsx`, `src/components/Ex
 | src/data/strings.js | About FormReady | aboutTitle | About FormReady | FormReady विषयी | moved |
 | src/data/strings.js | FormReady helps applicants prepare image files for online applications. It is a browser-based utility designed for Mahar | aboutBody | FormReady helps applicants prepare image files for online applications. It is a browser-based utility designed for Maharashtra applicants and people completing Indian exam, scholarship, and recruitment forms. | FormReady अर्जदारांना ऑनलाइन अर्जांसाठी फोटो तयार करण्यात मदत करते. हे महाराष्ट्रातील तसेच परीक्षा, शिष्यवृत्ती आणि भरती अर्ज भरणाऱ्या लोकांसाठी ब्राउझरमधील टूल आहे. | moved |
 | src/data/strings.js | Contact | contactTitle | Contact | संपर्क | moved |
-| src/data/strings.js | For questions about the tool or payment setup, contact the site owner using the WhatsApp link shown on the Pricing page. | contactBody | For questions about the tool or payment setup, contact the site owner using the WhatsApp link shown on the Pricing page. Do not send private identity documents unless a portal explicitly requires it. | टूल किंवा पेमेंटबद्दल प्रश्न असल्यास किंमत पानावरील WhatsApp लिंक वापरून संपर्क करा. पोर्टलने मागितल्याशिवाय वैयक्तिक कागदपत्रे पाठवू नका. | moved |
+| src/data/strings.js | Contact details | contactBody | For product, payment, or technical questions, use the owner’s WhatsApp contact shown on the site when configured. Never send identity documents unless a portal explicitly requires them. | टूल किंवा पेमेंटबद्दल प्रश्न असल्यास मालकाचा WhatsApp संपर्क उपलब्ध झाल्यावर त्याद्वारे संपर्क करा. पोर्टलने मागितल्याशिवाय ओळखपत्रे पाठवू नका. | moved |
 | src/data/strings.js | Privacy Policy | privacyTitle | Privacy Policy | गोपनीयता धोरण | moved |
 | src/data/strings.js | Files stay on this device and are not uploaded to FormReady. Your language, consent and Pack unlock choices are saved in | privacySummary | Files stay on this device and are not uploaded to FormReady. Your language, consent and Pack unlock choices are saved in this browser. | फाईल्स याच डिव्हाइसवर प्रक्रिया होतात; FormReady कडे अपलोड होत नाहीत. भाषा, संमती आणि Pack unlock निवड या ब्राउझरमध्ये जतन होतात. | moved |
 | src/data/strings.js | Image and PDF processing runs locally in your browser. Files are not uploaded to FormReady. No account is required. Your | privacyBody | Image and PDF processing runs locally in your browser. Files are not uploaded to FormReady. No account is required. Your language choice, consent choice, and any pack unlock are stored in this browser localStorage. Clearing browser data removes these settings. If advertising is enabled, Google AdSense may use cookies or similar technologies under its own policies and applicable consent requirements. Analytics loads only when the site owner configures a GA4 ID. Do not use public or shared devices for confidential documents. | Image and PDF processing runs locally in your browser. Files are not uploaded to FormReady. No account is required. Your language choice, consent choice, and any pack unlock are stored in this browser localStorage. Clearing browser data removes these settings. If advertising is enabled, Google AdSense may use cookies or similar technologies under its own policies and applicable consent requirements. Analytics loads only when the site owner configures a GA4 ID. Do not use public or shared devices for confidential documents. | exception (English legal body retained with Marathi summary above it, as allowed) |
@@ -166,12 +166,37 @@ Files reviewed: `src/App.jsx`, `src/components/HomePage.jsx`, `src/components/Ex
 | src/data/guides.json | MPSC (Maharashtra) guide prose | guide_mpsc | Owner supplied English copy | Owner supplied English copy | exception (inserted verbatim by request; source content supplied only in English) |
 | src/data/guides.json | MahaDBT Scholarship guide prose | guide_mahadbt | Owner supplied English copy | Owner supplied English copy | exception (inserted verbatim by request; source content supplied only in English) |
 
+
+| src/data/strings.js | Payment intro | paymentIntro | Choose one-time access for this browser. Checkout only unlocks after the payment is captured. | या ब्राउझरमध्ये वापरासाठी एक योजना निवडा. पैसे भरल्याची खात्री झाल्यावरच Pack सुरू होईल. | moved |
+| src/data/strings.js | Plan selector | selectPlan | Choose an access plan | वापराची योजना निवडा | moved |
+| src/data/strings.js | Pay button | payNow | Pay securely | सुरक्षित पैसे भरा | moved |
+| src/data/strings.js | Checkout loading | paymentWorking | Opening secure checkout… | सुरक्षित पेमेंट उघडत आहे… | moved |
+| src/data/strings.js | Payments disabled | paymentNotConfigured | Online payments are not configured yet. | ऑनलाइन पेमेंट अजून सुरू केलेले नाही. | moved |
+| src/data/strings.js | Checkout error | paymentUnavailable | Checkout is temporarily unavailable. Please try again. | पेमेंट सध्या उपलब्ध नाही. पुन्हा प्रयत्न करा. | moved |
+| src/data/strings.js | Payment failed | paymentFailed | Payment was not completed. You have not been charged for this attempt. | पेमेंट पूर्ण झाले नाही. या प्रयत्नासाठी पैसे घेतलेले नाहीत. | moved |
+| src/data/strings.js | Payment verification error | paymentVerifyError | Payment was received but could not be verified yet. Please contact support before paying again. | पेमेंट झाले, पण खात्री करता आली नाही. पुन्हा पैसे भरण्यापूर्वी मदतीसाठी संपर्क करा. | moved |
+| src/data/strings.js | Payment success | paymentSuccess | Payment verified. Your access is ready. | पेमेंट तपासले. तुमचा वापर सुरू झाला आहे. | moved |
+| src/data/strings.js | Access check | checkingPayment | Checking your access… | तुमचा वापर तपासत आहोत… | moved |
+| src/data/strings.js | Access expiry | paymentAccessUntil | Paid access is active until | पैसे भरलेला वापर येथेपर्यंत सुरू आहे: | moved |
+| src/data/strings.js | Checkout privacy note | secureCheckoutNote | Payments are processed by Razorpay. Your files stay on this device. | पेमेंट Razorpay द्वारे होते. तुमच्या फाईल याच डिव्हाइसवर राहतात. | moved |
+| src/data/strings.js | Shop plan availability | shopPlanContact | Multi-user Shop Plan is not available to purchase yet. | अनेक वापरकर्त्यांसाठी ही सेवा अजून सुरू झालेली नाही. | moved |
+| src/data/strings.js | Payment section heading | paymentInformationTitle | Secure payments and access | सुरक्षित पेमेंट आणि वापर | moved |
+| src/data/strings.js | Purchase terms summary | paymentInformationBody | Exam Pack and Season Pass are one-time purchases. Access starts after payment is captured and lasts for the period shown. | Exam Pack आणि हंगामी पास एकदाच पैसे भरून घेता येतात. पेमेंट पूर्ण झाल्यावर दाखवलेल्या कालावधीसाठी वापर सुरू होतो. | moved |
+| src/data/strings.js | Payment privacy summary | paymentPrivacy | Razorpay processes payment details. FormReady does not receive your card or UPI PIN. File processing stays in your browser. | पेमेंटची माहिती Razorpay हाताळते. FormReady ला तुमच्या कार्डची माहिती किंवा UPI PIN मिळत नाही. फाईल प्रक्रिया ब्राउझरमध्येच होते. | moved |
+| src/data/strings.js | Shop plan status | paymentComingSoon | Coming soon | लवकरच | moved |
+| src/data/strings.js | WhatsApp contact button | whatsappUs | Chat on WhatsApp | WhatsApp वर संपर्क करा | moved |
+| src/data/strings.js | Payment legal heading | paymentTitle | Payments | पेमेंट | moved |
+| src/data/strings.js | Payment legal text | paymentBody | Payment verification is handled by Razorpay and FormReady. Your payment ID and access period are saved in this browser. Card and UPI PIN details are handled by Razorpay. | पेमेंटची खात्री Razorpay आणि FormReady करतात. पेमेंट क्रमांक आणि वापराची मुदत या ब्राउझरमध्ये जतन होते. कार्ड आणि UPI PIN ची माहिती Razorpay हाताळते. | moved |
 ## Totals
 
-- Translation-map keys audited: 151 EN and MR entries.
-- UI strings moved into and rendered from the bilingual map: 148.
+- Translation-map keys audited: 171 EN and MR entries.
+- UI strings moved into and rendered from the bilingual map: 168.
 - Deliberate English legal-body exceptions: 3, each with a Marathi summary at the top of its page.
 - Owner-supplied English guide exceptions: 8, inserted verbatim as explicitly requested.
 - Proper nouns, official exam names, file-format acronyms, dimensions/units, `FormReady`, approved glossary terms (`Home`, `Exam Pack`, `Photo`, `Custom size`, `Download`) remain as named.
 - Marathi first paint: pass; the initial language state synchronously reads `fr-lang` before rendering.
 - Marathi UI screenshot/test files: `test-shots/mr-home.png`, `mr-tool.png`, `mr-pack.png`, `mr-pricing.png`.
+
+## Payment UI additions
+
+The checkout, payment status, plan labels, and privacy notices in `src/components/PaymentButton.jsx`, `src/components/ExamPack.jsx`, `src/App.jsx`, and `src/data/strings.js` use bilingual keys. Payment routes return machine errors and do not render user-visible HTML. Shop Plan purchase remains disabled until its multi-user feature is available.

@@ -1,7 +1,7 @@
 {
-  "siteUrl": "https://formready.example",
+  "siteUrl": "https://formready-xi.vercel.app",
   "adsensePublisherId": "",
-  "upiId": "YOUR_UPI_ID@bank",
+  "upiId": "",
   "whatsappNumber": "91XXXXXXXXXX",
   "prices": { "examPack": 49, "seasonPass": 99, "shopPlan": 499 }
 }
