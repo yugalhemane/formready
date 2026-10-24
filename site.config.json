@@ -1,0 +1,7 @@
+{
+  "siteUrl": "https://formready.example",
+  "adsensePublisherId": "",
+  "upiId": "YOUR_UPI_ID@bank",
+  "whatsappNumber": "91XXXXXXXXXX",
+  "prices": { "examPack": 49, "seasonPass": 99, "shopPlan": 499 }
+}

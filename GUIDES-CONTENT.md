@@ -1,0 +1,144 @@
+# FormReady — Guide content (READY TO INSERT VERBATIM)
+One guide per preset page. Each is exam-specific and 300–500 words. Codex: publish as-is
+(light formatting to HTML/JSX only). Do not shorten, summarise or rewrite.
+All guides end with the same disclaimer line, already included.
+
+---
+
+## GUIDE: IBPS PO / Clerk
+
+Bank exams through IBPS — PO, Clerk, RRB and Specialist Officer — reject thousands of applications every cycle for one small reason: the uploaded files do not match the specification in the notification. The portal checks four files, and each one has its own pixel size and KB range, so a file that passes for the photo will fail as a signature.
+
+The photograph must be 200 × 230 pixels and between 20 KB and 50 KB, in JPG format. It should be a recent colour photo, taken against a light or white background, with your face clearly visible and looking straight at the camera. Do not wear a cap or dark glasses. A studio photo is fine, but an old photo that no longer looks like you creates problems later, because IBPS also captures a live photograph during the application process and compares the two.
+
+The signature must be 140 × 60 pixels and between 10 KB and 20 KB. Sign with a **black ink pen** on plain white paper — blue ink and gel pens are common rejection reasons. Sign in your normal running hand, not in capital letters, and make sure the signature you upload matches the one you will sign at the examination hall and during document verification.
+
+IBPS asks for two more files that most candidates forget until the last step. The left thumb impression must be 240 × 240 pixels, 20–50 KB, taken with blue or black ink on white paper, without smudging. The handwritten declaration must be 800 × 400 pixels, 50–100 KB, written by you in English, in your own handwriting, on white paper with black ink. Declarations typed on a computer or written in another language are rejected.
+
+**Common rejection reasons:** photo below 20 KB because it was over-compressed on a phone app, signature in blue ink, declaration in Hindi or Marathi, thumb impression too light or blurred, and files uploaded in PNG instead of JPG.
+
+**How to prepare everything in five minutes:** sign and write the declaration on one white sheet, take clear photos of each item separately in daylight, then run each file through the matching tool on this page. Check that every result shows PASS with size inside its range before you open the IBPS form — and keep the same files saved for the admit-card and verification stages.
+
+*Specs change with every notification. Always compare with your official IBPS notification — if its numbers differ, use Custom mode on this site.*
+
+---
+
+## GUIDE: SBI PO / Clerk
+
+SBI follows almost the same upload rules as IBPS, and candidates who apply to both banks in the same season often assume the same files will pass on both portals. Mostly they will — but prepare them once, correctly, and check each file instead of discovering a rejection after the fee is paid.
+
+The photograph must be 200 × 230 pixels, between 20 KB and 50 KB, JPG. Use a recent colour photo on a light background. SBI is strict about clarity: a blurred, dark or heavily filtered photo can be rejected even when the file size is correct. Avoid selfies taken at an angle; a straight, front-facing photo works best.
+
+The signature must be 140 × 60 pixels, between 10 KB and 20 KB, signed in black ink on white paper in running hand. Signatures in capital letters, or a signature that differs from your PAN/Aadhaar-style signature used at verification, cause trouble at later stages — the exam-day signature, the uploaded signature and the verification signature should all be the same hand and style.
+
+Like IBPS, SBI also requires a left thumb impression (240 × 240 pixels, 20–50 KB) and a handwritten declaration (800 × 400 pixels, 50–100 KB) in English, in your own handwriting, in black ink. Write the declaration text exactly as given in the SBI notification; changing the wording is a known reason for rejection at the documentation stage.
+
+**Common rejection reasons:** file size correct but dimensions wrong (a square-cropped photo, for example), signature scanned with shadows across it, thumb impression taken with a dry ink pad so the ridges are invisible, and declaration photographed at an angle so the lines slope.
+
+**Practical tip:** prepare one clean master set — photo, signature, thumb, declaration — at the exact SBI sizes using the tools on this page, save it in a folder named for the exam, and reuse the same master set for IBPS. Never re-compress a file that already passed; repeated compression pushes it below the minimum KB and it starts failing.
+
+*Specs change with every notification. Always compare with your official SBI notification — if its numbers differ, use Custom mode on this site.*
+
+---
+
+## GUIDE: SSC CGL / CHSL / MTS — Signature
+
+The Staff Selection Commission changed how photographs work, and this single change confuses lakhs of applicants every cycle. For current SSC cycles there is **no photo upload**: the application form captures your photograph live through your phone or webcam. Uploading gets you nothing — instead, prepare for the live capture: sit in good light against a plain, light-coloured wall, face the camera directly, and remove caps, masks and spectacles. A photo of an old printed photo held up to the camera is detected and rejected.
+
+The file you DO upload is your signature, and it is where SSC forms actually fail. The signature must be a JPG between 10 KB and 20 KB, roughly 4–6 cm wide × 2 cm tall (about 140 × 60 pixels at minimum). It must be your normal running signature in black or blue ink on plain white paper — clear, dark and legible.
+
+**Common rejection reasons:** signature smaller than 10 KB because it was over-compressed, signature written in capital letters, a tiny signature scanned from the corner of a full page so it becomes a few blurry pixels after cropping, shadows on the paper, and signature images in PNG or PDF instead of JPG.
+
+**How to get it right:** sign once, firmly, in the middle of a clean white sheet — not your smallest signature, your clearest one. Take the photo of the sheet straight from above in daylight, without flash glare. Crop tightly around the signature using the tool on this page, and let it land inside 10–20 KB. Check the preview at full size: if you cannot read your own signature strokes clearly, the SSC system will struggle too — re-sign darker rather than forcing a weak scan.
+
+One more SSC habit worth copying: because the photo is live, the face on your application is exactly how you look on capture day. Keep your appearance consistent for the exam day and document verification — same spectacles habit (none, if you captured without), similar look. Mismatches between the live photo and the candidate at the centre create verification delays that no file tool can fix later.
+
+*Specs change with every notification. Always compare with your official SSC notification — if its numbers differ, use Custom mode on this site.*
+
+---
+
+## GUIDE: RRB NTPC UG 2026 — Signature
+
+Railway Recruitment Board notices do not all use the same signature size, and RRB NTPC UG 2026 is the clearest example of why copying numbers from an old video or last year's blog is dangerous. Many older RRB guides quote 10–20 KB for the signature. For the NTPC UG 2026 cycle, the specified signature range is **30 KB to 49 KB**, JPG/JPEG, with minimum dimensions of 140 × 60 pixels and a minimum scanning resolution of 100 DPI. A perfectly good 15 KB signature file — correct for other exams — is simply too small for this cycle and will be rejected.
+
+The signature itself must be in running handwriting, signed by you with a black ink pen on white paper — not in block or capital letters. Write it inside an imaginary box of about 80 mm × 20 mm, centred on the paper, so the scan crops naturally to the required shape. RRB compares this signature later, so keep it identical to the one you use at the exam centre.
+
+RRB also captures a **live photograph** during the application on current cycles, so there is no photo file to prepare — but sit for it properly: plain white background, camera at eye level, face covering at least half the frame, no cap, mask or glasses, and clothes in a non-white colour so your outline separates from the background.
+
+Documents are the other RRB trap. Where a certificate is asked — for example the SC/ST certificate for candidates claiming a free travel pass — it must be a PDF **below 400 KB**. Phone-scanned certificates routinely come out at 2–5 MB. Use the PDF compressor on this site with the 400 KB target and check the PASS result before you start the form.
+
+**Common rejection reasons:** signature prepared at the old 10–20 KB size, signature in capitals, certificate PDF above the limit, live photo taken against a busy or dark background, and a signature scan with the paper's edges and shadows included.
+
+**Before you submit:** verify your signature file properties one last time — JPG, between 30 and 49 KB. That one check, against this cycle's actual notification, is the whole game.
+
+*Specs change with every notification — RRB changed this one between cycles. Always compare with your official RRB notification — if its numbers differ, use Custom mode on this site.*
+
+---
+
+## GUIDE: NEET UG (NTA)
+
+NEET UG applications through the NTA ask for more images than most exams, and the rules are about the picture as much as the file. Three uploads matter: the passport-size photograph, the postcard-size photograph, and your signature.
+
+Both photographs must be JPG, between 10 KB and 200 KB each. The content rules are strict and are checked: recent colour photo, white background, and **about 80% of the image should be your face, with ears visible**, looking straight at the camera. No mask, no cap, no dark glasses. NTA has rejected photos where the face is a small part of a big picture, photos with coloured or patterned backgrounds, and old studio photos reused from previous years. Take a fresh photo for this cycle — the bulletin specifies the photo must be recent.
+
+The postcard-size photo (4 × 6 inch) is the same photograph at the larger size; it is used on the admit card and attendance sheet. Use the same master photo for both, resized by the tools on this page — never two different photos, because a mismatch between your passport and postcard images invites questions at the centre.
+
+The signature must be clear and legible, in the KB range given in the current Information Bulletin (recent bulletins place it in the low range, roughly 4–30 KB). Sign in black or blue ink on white paper, crop tightly, and make sure the strokes stay dark after compression — signatures are the most commonly unreadable upload in NEET applications.
+
+**Common rejection reasons:** face too small in the frame, ears covered by hair, background not white, photo older than the date the bulletin allows, signature too light, and files above 200 KB uploaded straight from a phone camera.
+
+**Practical preparation:** take one excellent photo against a plain white wall in daylight, shoulders up, ears visible. Save it untouched as your master. Generate the passport version, the postcard version and check both show PASS here. Do the same single-master approach for the signature. When the form, admit card and counselling documents all show the same face and signature, every later stage gets easier.
+
+*Specs change with every bulletin. Always compare with the current NEET Information Bulletin — if its numbers differ, use Custom mode on this site.*
+
+---
+
+## GUIDE: UPSC CSE / NDA / CDS
+
+UPSC gives applicants the widest file limits of any major Indian exam — and still rejects applications over uploads, usually not for size but for mismatch. Both the photograph and the signature must be JPG files between 20 KB and 300 KB. That generous range means almost any clear scan passes the size check, so your real job is quality and consistency.
+
+UPSC also captures a **live photograph** during the application and compares it with the uploaded photograph. Upload a recent photo that looks like you do now — not your best photo from three years ago. If the person in the uploaded photo and the person in the live capture look meaningfully different, you create a verification problem that follows you to the personality test stage. Use a recent, plain-background, front-facing colour photo with your full face clearly visible.
+
+The signature has its own consistency rule: UPSC asks for the signature in the application, and the same signature is expected on attendance sheets and documents through the process. Candidates have faced queries for using different signature styles at different stages. Decide on one signature — the one in your normal running hand — and use it everywhere, at a size where every stroke is readable inside the 20–300 KB range.
+
+You may also need to upload a photo identity document as a PDF within the same 20–300 KB band. Aadhaar or PAN scans from a phone are usually several MB; compress the PDF to the target with the tool on this site and then **open the result and read it** — a compressed ID that nobody can read is a failed upload even if the size is perfect.
+
+**Common rejection reasons:** an old uploaded photo that does not match the live capture, different signatures across stages, an unreadable compressed ID PDF, and files in PNG or PDF format where a JPG image was asked.
+
+**A note on proportions:** because the UPSC range is wide, do not over-compress to 20 KB "to be safe". Use the middle of the range (roughly 100–200 KB) so faces and signature strokes stay crisp. This site's tool targets the safe middle of a range when you use the UPSC preset, not the bare minimum.
+
+*Specs change with every notification. Always compare with your official UPSC notification — if its numbers differ, use Custom mode on this site.*
+
+---
+
+## GUIDE: MPSC (Maharashtra)
+
+Maharashtra Public Service Commission applications — Rajyaseva, Group B, Group C, Police and other state recruitments — run through the MPSC online portal, and Maharashtra candidates hit the same upload wall as national exams, usually on a phone, often on the last day.
+
+The photograph must be a JPG between 20 KB and 50 KB. Use a recent colour photo with a plain light background, front-facing, face clearly visible. The signature must be a JPG between 10 KB and 20 KB, in your running hand with black or blue ink on white paper, cropped tightly so the strokes are large and dark enough to read after compression.
+
+MPSC applications also involve certificates — caste, non-creamy layer, EWS, domicile, education — uploaded within the limits stated in the specific advertisement. These documents are where Maharashtra applicants most often fail: a certificate scanned at a cyber café or photographed on a phone is commonly 1–4 MB, far above portal limits. Convert and compress each document PDF to the limit in your advertisement using the PDF tools on this site, then open the result and confirm every word and stamp is still readable before uploading.
+
+**Common rejection reasons:** photo below the 20 KB minimum after aggressive phone compression, signature scans including the full A4 page (so the actual signature becomes tiny), certificates above the size limit, and — a Maharashtra-specific one — documents in the wrong language version where the advertisement asks for a specific certificate format or validity period, such as a non-creamy layer certificate of the required financial year. File size tools cannot fix a wrong-year certificate; read the advertisement's document list carefully.
+
+**Why FormReady has an MPSC preset at all:** national tools rarely include Maharashtra state exams. The preset on this page applies the standard MPSC photo and signature sizes in one tap, in Marathi or English, and your files are processed on your own phone — your certificates never get uploaded to our server, because this site has no server. For documents as personal as caste and income certificates, that privacy is the point.
+
+*Specs change with every advertisement (jahirat). Always compare with your official MPSC advertisement — if its numbers differ, use Custom mode on this site.*
+
+---
+
+## GUIDE: MahaDBT Scholarship
+
+On the MahaDBT portal, scholarships are rarely lost on eligibility — they are lost on documents. The portal requires every supporting document as a PDF **below 200 KB each**, and a phone-scanned marksheet, income certificate or caste certificate is normally 1–5 MB. The upload simply refuses it, and many students discover this on the last date, in a queue at a cyber café, paying per attempt.
+
+The fix is preparation, a day early. List the documents your scheme actually asks for — typically marksheets, income certificate, caste certificate and validity, domicile, Aadhaar, bank passbook copy, fee receipt, and the bonafide certificate — and prepare each one as a clean PDF under 200 KB. Use the PDF compressor on this site with the 200 KB MahaDBT target. Then do the step most people skip: **open each compressed PDF and read it.** Numbers on the income certificate, the caste certificate's barcode and stamps, and marksheet grades must all stay legible after compression. A 180 KB PDF that the verifying officer cannot read will be sent back as "document not clear", which costs you more time than the size problem did.
+
+Your photo (20–50 KB) and signature (10–20 KB) on MahaDBT follow the standard sizes — prepare them with the tools on this page in the same sitting, so your full document set is ready together.
+
+**Common MahaDBT problems:** PDF above 200 KB, blurred compressed documents, the previous year's income certificate uploaded where the current financial year's is required, name spellings differing between Aadhaar, marksheet and bank account (a mismatch the portal flags), and documents uploaded in the wrong field — income certificate in the caste field is a real and frequent mistake.
+
+**Privacy note that matters here:** these are your family's income and caste documents — among the most personal files you own. FormReady compresses PDFs inside your own browser; the files never leave your phone or computer and are never stored anywhere. If any website asks you to upload such documents to *their* server just to reduce the size, that is a reason to close the tab.
+
+Prepare the full set one day before the deadline, keep it in one folder, and the actual MahaDBT application becomes a ten-minute form instead of a last-day emergency.
+
+*Limits can vary by scheme. Always compare with your scheme's document list on MahaDBT — if a limit differs, use Custom mode on this site.*
