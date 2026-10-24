@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { track } from '../lib/analytics';
 import { config } from '../config';
 import UpiPayment from './UpiPayment';
+import { Link } from 'react-router-dom';
+import { accountsEnabled } from '../lib/supabase';
+import { setAccountAccessHint } from '../lib/accessHint';
 
 const checkoutUrl = 'https://checkout.razorpay.com/v1/checkout.js';
 function loadCheckout() {
@@ -18,16 +21,16 @@ function loadCheckout() {
   return window.__formReadyCheckout;
 }
 
-export default function PaymentButton({ plan, t, setUnlock, onSuccess, className = 'primary btn btn-warning' }) {
+export default function PaymentButton({ plan, t, setUnlock, onSuccess, session, user, className = 'primary btn btn-warning' }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
-  const enabled = Boolean(import.meta.env.VITE_RAZORPAY_KEY_ID);
+  const enabled = Boolean(import.meta.env.VITE_RAZORPAY_KEY_ID) && (!accountsEnabled || Boolean(user && session?.access_token));
   async function purchase() {
     if (!enabled || busy) return;
     setBusy(true); setMessage('');
     try {
       const orderResponse = await fetch('/api/payments/order', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }),
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) }, body: JSON.stringify({ plan }),
       });
       const order = await orderResponse.json();
       if (!orderResponse.ok) throw new Error(order.error || 'order_creation_failed');
@@ -41,7 +44,7 @@ export default function PaymentButton({ plan, t, setUnlock, onSuccess, className
             let verified;
             for (let attempt = 0; attempt < 4; attempt++) {
               const result = await fetch('/api/payments/verify', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
                 body: JSON.stringify({ plan, orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id, signature: response.razorpay_signature }),
               });
               const data = await result.json();
@@ -50,7 +53,8 @@ export default function PaymentButton({ plan, t, setUnlock, onSuccess, className
               await new Promise(resolve => setTimeout(resolve, 1200));
             }
             if (!verified) throw new Error('payment_not_captured');
-            localStorage.setItem('fr-unlock', JSON.stringify(verified));
+            if (!accountsEnabled) localStorage.setItem('fr-unlock', JSON.stringify(verified));
+            else setAccountAccessHint(user.id, verified.expiresAt);
             setUnlock(verified);
             await track('pack_unlocked', { plan });
             onSuccess?.(verified);
@@ -69,9 +73,10 @@ export default function PaymentButton({ plan, t, setUnlock, onSuccess, className
   }
   return <div className="payment-action">
     <button className={className} type="button" disabled={!enabled || busy} onClick={purchase}>
-      {busy ? t.paymentWorking : enabled ? t.payNow : t.paymentNotConfigured}
+      {busy ? t.paymentWorking : enabled ? t.payNow : accountsEnabled && !user ? t.signInToPay : t.paymentNotConfigured}
     </button>
+    {accountsEnabled && !user && <Link className="account-prompt" to="/account">{t.signInTitle}</Link>}
     {message && <p role="status" className="payment-message">{message}</p>}
-    <UpiPayment price={config.prices[plan]} plan={plan} t={t} />
+    <UpiPayment price={config.prices[plan]} plan={plan} t={t} user={user} />
   </div>;
 }

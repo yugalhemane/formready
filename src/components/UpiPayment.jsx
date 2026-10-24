@@ -1,6 +1,8 @@
 import { config } from '../config';
+import { Link } from 'react-router-dom';
+import { accountsEnabled } from '../lib/supabase';
 
-export default function UpiPayment({ price, plan, t }) {
+export default function UpiPayment({ price, plan, t, user }) {
   if (!config.upiId) return null;
   const params = new URLSearchParams({
     pa: config.upiId,
@@ -9,7 +11,9 @@ export default function UpiPayment({ price, plan, t }) {
     cu: 'INR',
     tn: `FormReady ${plan}`,
   });
-  const message = `Hi, I paid ₹${price} for the FormReady ${plan}. Please verify my UPI payment and send my access code.`;
+  const message = accountsEnabled
+    ? `Hi, I paid ₹${price} for FormReady ${plan}. My account email is ${user?.email || ''}. Please verify my UPI payment and activate access for this account.`
+    : `Hi, I paid ₹${price} for the FormReady ${plan}. Please verify my UPI payment and send my access code.`;
   const whatsapp = config.whatsappNumber && /^\d{10,15}$/.test(config.whatsappNumber)
     ? `https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(message)}`
     : null;
@@ -17,12 +21,14 @@ export default function UpiPayment({ price, plan, t }) {
   return <details className="upi-payment">
     <summary>{t.upiPaymentTitle}</summary>
     <div className="upi-content">
+      {accountsEnabled && !user ? <p>{t.upiSignInRequired} <Link to="/account">{t.signInTitle}</Link></p> : <>
       <p>{t.upiPaymentHelp.replace('{price}', String(price))}</p>
       <img className="upi-qr" src="/upi-qr.jpg" alt={t.upiQrAlt} width="400" height="500" />
       <p className="upi-id">{t.upiId} <strong>{config.upiId}</strong></p>
       <a className="secondary upi-app-link" href={`upi://pay?${params.toString()}`}>{t.payUpi}</a>
       {whatsapp && <a className="secondary upi-whatsapp" href={whatsapp} target="_blank" rel="noreferrer">{t.sendScreenshot}</a>}
-      <small>{t.upiManualNotice}</small>
+      <small>{accountsEnabled ? t.upiManualAccountNotice : t.upiManualNotice}</small>
+      </>}
     </div>
   </details>;
 }

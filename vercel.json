@@ -3,6 +3,8 @@
   "rewrites": [
     { "source": "/tool/:path*", "destination": "/index.html" },
     { "source": "/exam-pack", "destination": "/index.html" },
+    { "source": "/account", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/index.html" },
     { "source": "/pricing", "destination": "/index.html" },
     { "source": "/about", "destination": "/index.html" },
     { "source": "/contact", "destination": "/index.html" },

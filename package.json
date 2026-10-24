@@ -11,9 +11,13 @@
     "test:browser": "node tools/run-browser-checks.js",
     "test:assets": "node tools/make-test-assets.js",
     "access-code": "node --env-file=.env.local tools/create-access-code.js",
-    "test:payments": "node --test tools/payments.test.js"
+    "test:payments": "node --test tools/payments.test.js",
+    "test:accounts": "node --test tools/accounts.test.js",
+    "test:account-ui": "node tools/test-account-ui.mjs",
+    "test:documents": "node tools/test-document-tools.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "@vitejs/plugin-react": "latest",
     "bootstrap": "^5.3.8",
     "heic2any": "^0.0.4",

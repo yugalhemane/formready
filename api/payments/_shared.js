@@ -10,7 +10,11 @@ export function configured() { return Boolean(process.env.RAZORPAY_KEY_ID && pro
 export function tokenConfigured() { return Boolean(process.env.PACK_TOKEN_SECRET); }
 export function reply(res, status, data) { res.setHeader('Cache-Control', 'no-store, private'); return res.status(status).json(data); }
 export function method(req, res) { if (req.method === 'POST') return true; res.setHeader('Allow', 'POST'); reply(res, 405, { error: 'method_not_allowed' }); return false; }
-export function requiredSecrets(res) { if (configured()) return true; reply(res, 503, { error: 'payments_not_configured' }); return false; }
+export function requiredSecrets(res) {
+  const accountMode = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY));
+  if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET && (accountMode || process.env.PACK_TOKEN_SECRET)) return true;
+  reply(res, 503, { error: 'payments_not_configured' }); return false;
+}
 export function razorpayAuth() { return `Basic ${Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString('base64')}`; }
 export async function razorpay(path, options = {}) {
   const response = await fetch(`https://api.razorpay.com/v1${path}`, {

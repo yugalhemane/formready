@@ -2,6 +2,28 @@
 
 Date: 2026-10-24
 
+## Account, payments, and owner dashboard update (2026-10-25)
+
+The account-backed access path has been implemented alongside the original legacy token mode. Apply the schema in `supabase/migrations/202610250001_account_entitlements.sql` before enabling `VITE_SUPABASE_URL` in Vercel. Files remain local in the user's browser; the database stores profile name/email, payment references, pass dates, rate-limit counters, and owner audit events.
+
+- **Database/auth:** Supabase email-link sign-in and a profile trigger/backfill; RLS permits users to read their own profile, orders, and entitlements. Trusted writes use server-only Supabase credentials. The service key is never bundled into Vite.
+- **Payment/access:** order creation authenticates the account, uses server catalog prices, saves the pending order, and limits an account to five new orders per 15 minutes. Callback verification checks payment capture and order ownership. `payment.captured` / `order.paid` webhooks cover browser-close cases; both paths finalize access through the same idempotent database function. Pass time starts at payment time (and extends after an existing active pass).
+- **Owner dashboard:** `/admin` checks the signed-in UUID against server-only `ADMIN_USER_IDS`; lists profiles, paid orders and passes; supports reasoned UPI grants and revocations with atomic audit records. UPI needs owner confirmation before grant.
+- **Browser account test:** `npm run test:account-ui` — **PASS**. Mocked email OTP carries the entered email/name, the account page loads with a seeded test session, and a non-admin account receives the translated “not approved” message. Zero page errors. Evidence script: `tools/test-account-ui.mjs`.
+- **Account/payment API tests:** `npm run test:accounts` — **8/8 PASS**: authenticated server-priced order persists, missing auth is denied, captured payment is granted only to the matching account, account access is database-read, webhook HMAC is accepted/rejected, owner search reads payment/pass records, owner grants/revokes use audited database functions, and non-admin access is denied. `npm run test:payments` — **5/5 PASS** for legacy signature, captured-only, fixed-price and replay checks. These use mocked Supabase/Razorpay HTTP responses; they are not a live merchant/database transaction.
+- **Full browser regression:** `npm run test:browser` — **PASS**. Single crop output **200 × 230 px / 27.7 KB**. IBPS Pack **4/4 PASS**; ZIP: `photo.jpg` 29.0 KB, `signature.jpg` 10.0 KB, `thumb.jpg` 35.3 KB, `declaration.jpg` 99.6 KB. The intercepted GA body includes `en=tool_used`, `en=pack_unlocked`, and `en=zip_downloaded`; see `test-shots/browser-results.json`. Responsive home/tool screenshots at 360/768/1440 are in `test-shots/`.
+- **PDF regression:** **PASS**. `node tools/test-pdf-compression.js`: source 12,185,546 bytes / 11,899.9 KB; three pages; output **130.6 KB** for a 200 KB target; an impossible 1 KB request is reported as **6.7 KB**, not success.
+- **Build:** **PASS** (`npm run build`). Main entry **494.08 KB / 148.69 KB gzip**; CSS **246.92 KB / 35.28 KB gzip**; lazy chunks: HEIC **1,352.13 KB**, PDF tools **420.90 KB**, PDF route **430.17 KB**, JSZip **95.93 KB**. Build retains the pre-existing large-chunk warning for the PDF worker and HEIC.
+
+### Activation steps still owned by the site owner
+
+1. Create the Supabase project, apply the migration above, configure the Supabase Auth site URL/redirect allow-list and production email delivery.
+2. Add `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` (or publishable equivalent) and server-only `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEY` to Vercel. Never use a `VITE_` prefix for the secret key.
+3. Keep Razorpay Test Mode first: `VITE_RAZORPAY_KEY_ID`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`; point the webhook at `/api/payments/webhook` and enable `payment.captured` and `order.paid`.
+4. Sign in once, copy the owner UUID from Supabase Auth, and set server-only `ADMIN_USER_IDS`. Redeploy and perform a real Test Mode order before enabling Live Mode.
+
+**External blockers:** no Supabase project, Razorpay credentials, webhook secret, or admin UUID are available in this workspace, so production account mode, real charge/capture, database migration execution, and load testing against the owner's deployment have not been performed. If `SUPABASE_URL` is unset, the legacy browser-bound access mode still operates. Paid products are fixed-duration one-time passes (24 hours/60 days); recurring auto-renew subscriptions and the Shop Plan remain unimplemented. Single-image resizing remains free and browser-only by design; refresh/cache clearing cannot be treated as payment protection for a free client-side feature.
+
 ## Guides
 
 The eight owner-supplied guides are rendered verbatim below their spec tables and tools. Counts were measured from rendered guide content with `node tools/count-guide-words.mjs`.
@@ -64,3 +86,22 @@ Razorpay Standard Checkout is wired through Vercel Functions at `api/payments/or
 1. Activate the Razorpay merchant account and set the four payment environment variables above in Vercel. Test with Test Mode first, then replace with activated Live Mode keys.
 2. Set the actual WhatsApp contact number. Configure GA4 and AdSense only if you want those services enabled.
 3. Redeploy after setting Vercel environment variables.
+
+## Walkthrough and selected-file UI (2026-10-25)
+
+- First-visit walkthrough: **PASS**. English, Hindi, and Marathi strings; dismissal is stored in `fr-tour-seen-v1`, reload does not reopen it, and the header button reopens it. Screenshot: `test-shots/walkthrough-360.jpg`.
+- Selected image handling: **PASS**. The single-file tool shows the source image, filename, and size in its upload box. Crop/zoom/rotate, replace, and remove controls work. Playwright verifies preview display, removal, reselection, and a processed result of **200 x 230 px / 27.7 KB**. Screenshot: `test-shots/tool-selected-file-360.jpg`.
+- Exam Pack slots: **PASS**. Selected files show previews, names, and sizes inline. Playwright removes/reselects the photo, crops it, processes all four IBPS files, and verifies the ZIP. Outputs: photo **200 x 230 / 29.0 KB**, signature **140 x 60 / 10.0 KB**, thumb **240 x 240 / 35.3 KB**, declaration **800 x 400 / 99.6 KB**. Details: `test-shots/browser-results.json`.
+- Responsive UI: screenshots at 360, 768, and 1440 px were regenerated and visually reviewed. Build and browser flow pass, including payment-gated Pack simulation, crop, checklist, ZIP, analytics collection, and declined consent.
+
+## Document tools expansion and image preview (2026-10-25)
+
+- The single-file upload area shows the selected photo across the available box with its original aspect ratio (`object-fit: contain`). Pack previews remain compact. Screenshots: `test-shots/tool-selected-file-360.jpg` and `test-shots/walkthrough-360.jpg`.
+- `/tool/pdf` provides PDF compression, multiple images to PDF, and PDF merging in selected order. Processing stays in the browser; HEIC conversion is supported for image-to-PDF.
+- `npm run test:documents`: **PASS**, consent declined and zero browser errors. Two images produced a two-page **6,699.5 KB** PDF; merging two copies produced a four-page **13,398.4 KB** PDF. Screenshot: `test-shots/document-workspace-1440.jpg`.
+- Further tools suggested by the reference screenshots include split/rotate/extract/reorder PDF pages, image format conversion, OCR, Office conversion, editing, password protection, redaction, and AI tools. These are not implemented yet and should only be advertised after they work and are verified.
+
+## Dark mode and document-suite direction (2026-10-25)
+
+- Added a shared header theme toggle. Light/dark choice is saved as `fr-theme` and applied on load; labels are localized in English, Marathi, and Hindi. Production build passes (main JS 508.21 KB / 152.24 KB gzip; CSS 252.32 KB / 36.34 KB gzip).
+- `npm run test:documents` verifies dark-mode activation and persistence across reload; screenshot: `test-shots/dark-mode-1440.jpg`. Image-to-PDF and PDF-merge assertions also pass in that browser test.
