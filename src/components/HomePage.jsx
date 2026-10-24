@@ -34,13 +34,13 @@ export default function HomePage({ t }) {
           <div><span className="eyebrow">{t.homeToolsEyebrow}</span><h2>{t.chooseExam}</h2><p>{t.notice}</p></div>
           <Link className="text-link" to="/tool/custom">{t.custom}<ArrowRight size={15} /></Link>
         </div>
-        <div className="grid row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
-          {presets.map(p => <Link className="tool-card col" key={p.id} to={'/tool/' + p.id}>
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+          {presets.map(p => <div className="col" key={p.id}><Link className="tool-card d-block h-100" to={'/tool/' + p.id}>
             <span className="iconbox"><FileImage /></span><span className="card-arrow"><ArrowRight /></span>
             <h3>{t[`preset_${p.id}`] || p.name}</h3>
             <p>{p.slots.length} {p.slots.length === 1 ? t.documentTypeOne : t.documentTypes}</p>
-          </Link>)}
-          <Link className="tool-card col" to="/tool/pdf"><span className="iconbox"><FileText /></span><span className="card-arrow"><ArrowRight /></span><h3>{t.pdfTools}</h3><p>{t.pdfDesc}</p></Link>
+          </Link></div>)}
+          <div className="col"><Link className="tool-card d-block h-100" to="/tool/pdf"><span className="iconbox"><FileText /></span><span className="card-arrow"><ArrowRight /></span><h3>{t.pdfTools}</h3><p>{t.pdfDesc}</p></Link></div>
         </div>
 
         <section className="value-section">
