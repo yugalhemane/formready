@@ -20,10 +20,12 @@ try {
     console.log(route, 'UI checked');
   }
   await auditRoute('/', 'home');
-  await page.locator('#language-select').selectOption('en');
+  await page.locator('.language-toggle').click();
+  await page.locator('.language-options button[lang="en"]').click();
   await page.reload();
-  if (await page.locator('#language-select').inputValue() !== 'en') throw Error('English language preference did not persist');
-  await page.locator('#language-select').selectOption('mr');
+  if (!(await page.locator('.language-toggle').innerText()).includes('English')) throw Error('English language preference did not persist');
+  await page.locator('.language-toggle').click();
+  await page.locator('.language-options button[lang="mr"]').click();
   await page.reload();
   if (!(await page.locator('h1').first().innerText()).includes('फोटो आणि सही')) throw Error('Marathi language preference did not persist/apply');
   await auditRoute('/tool/ibps', 'tool');
