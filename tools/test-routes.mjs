@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 import { presets } from '../src/data/presets.js';
 
 const origin = 'http://127.0.0.1:5197';
-const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5197', '--strictPort'], { stdio: 'ignore' });
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5197', '--strictPort'], { stdio: 'ignore', env: { ...process.env, VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || 'https://formready-route-test.supabase.co', VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || 'route-test-anon-key' } });
 let browser;
 try {
   let ready = false;
@@ -12,20 +12,38 @@ try {
   browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
   const routes = ['/', '/exam-pack', '/pricing', '/account', '/admin', '/about', '/contact', '/privacy-policy', '/terms', '/disclaimer', '/tool/custom', '/tool/pdf', ...presets.map(p => `/tool/${p.id}`)];
   const failures = [], errors = [];
-  for (const width of [1440, 360]) {
+  for (const theme of ['light', 'dark']) for (const width of [360, 768, 1440]) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
-    await page.addInitScript(() => { localStorage.setItem('fr-lang', 'en'); localStorage.setItem('fr-tour-seen-v1', '1'); localStorage.setItem('fr-consent', 'declined'); localStorage.setItem('fr-theme', 'light'); });
-    page.on('pageerror', error => errors.push(`${width}px ${page.url()}: ${error.message}`));
+    await page.addInitScript(themeName => { localStorage.setItem('fr-lang', 'en'); localStorage.setItem('fr-tour-seen-v1', '1'); localStorage.setItem('fr-consent', 'declined'); localStorage.setItem('fr-theme', themeName); }, theme);
+    page.on('pageerror', error => errors.push(`${theme} ${width}px ${page.url()}: ${error.message}`));
     for (const route of routes) {
       const response = await page.goto(`${origin}${route}`);
       const title = await page.title(), h1 = await page.locator('main h1').first().textContent().catch(() => '');
       const meta = await page.locator('meta[name="description"]').getAttribute('content');
       const og = await page.locator('meta[property="og:title"]').getAttribute('content');
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
-      if (!response?.ok() || !title || !h1?.trim() || !meta || !og || overflow) failures.push({ width, route, status: response?.status(), title, h1, description: !!meta, og: !!og, overflow });
+      const visual = await page.evaluate(() => {
+        const rgb = value => value.match(/\d+/g)?.slice(0, 3).map(Number) || [];
+        const root = getComputedStyle(document.documentElement).backgroundColor;
+        const body = getComputedStyle(document.body).backgroundColor;
+        const isDark = root === 'rgb(17, 24, 39)' && body === 'rgb(17, 24, 39)';
+        const primary = [...document.querySelectorAll('.primary.btn-warning')].filter(el => el.getClientRects().length).map(el => {
+          const s = getComputedStyle(el), bg = rgb(s.backgroundColor), fg = rgb(s.color);
+          const lum = c => { c /= 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; };
+          const [a,b] = [bg.map(lum).reduce((x,v,i)=>x+[.2126,.7152,.0722][i]*v,0), fg.map(lum).reduce((x,v,i)=>x+[.2126,.7152,.0722][i]*v,0)].sort((x,y)=>y-x);
+          return { contrast: (a + .05) / (b + .05), background: s.backgroundColor, color: s.color, disabled: el.disabled, text: el.innerText };
+        });
+        return { root, body, isDark, primaryMinContrast: primary.length ? Math.min(...primary.map(p=>p.contrast)) : null, primary, overflow: document.documentElement.scrollWidth > innerWidth + 1 };
+      });
+      if (!response?.ok() || !title || !h1?.trim() || !meta || !og || visual.overflow || (theme === 'dark' && !visual.isDark) || visual.primaryMinContrast !== null && visual.primaryMinContrast < 4.5) failures.push({ theme, width, route, status: response?.status(), title, h1, description: !!meta, og: !!og, ...visual });
+      if (theme === 'dark' && route === '/pricing') {
+        const cta = page.locator('.payment-login-cta').first();
+        if (await cta.count() && await cta.getAttribute('href') !== '/account?next=%2Fpricing') failures.push({ theme, width, route, loginReturn: await cta.getAttribute('href') });
+        if (!(await cta.count())) failures.push({ theme, width, route, loginReturn: 'missing sign-in CTA' });
+      }
+      if (route === '/' || route === '/tool/ibps' || route === '/pricing') await page.screenshot({ path: `test-shots/${theme}-${route === '/' ? 'home' : route === '/pricing' ? 'pricing' : 'tool'}-${width}.png`, fullPage: true });
     }
     await page.close();
   }
   if (errors.length || failures.length) throw new Error(JSON.stringify({ errors, failures }, null, 2));
-  console.log(JSON.stringify({ routeCount: routes.length, widths: [1440, 360], directLoad: 'PASS', h1AndSeo: 'PASS', horizontalOverflow: 'none', pageErrors: errors }, null, 2));
+  console.log(JSON.stringify({ routeCount: routes.length, themes: ['light', 'dark'], widths: [360, 768, 1440], directLoad: 'PASS', h1AndSeo: 'PASS', darkCanvas: 'PASS', primaryButtonContrast: '>=4.5:1', signedOutPurchaseRedirect: 'PASS', horizontalOverflow: 'none', pageErrors: errors }, null, 2));
 } finally { await browser?.close(); server.kill(); }

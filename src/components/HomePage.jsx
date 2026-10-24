@@ -5,11 +5,11 @@ import AdSlot from './AdSlot';
 import '../home.css';
 
 export default function HomePage({ t }) {
-  return <main className="home-page">
+  return <main className="home-page container">
     <AdSlot slot="home-top" label={t.ad} />
 
-    <section className="hero home-hero">
-      <div className="hero-copy">
+    <section className="hero home-hero row g-4">
+      <div className="hero-copy col-lg-8">
         <span className="eyebrow"><ShieldCheck size={16} />{t.neverLeaves}</span>
         <h1>{t.homeHeroTitle}</h1>
         <p>{t.homeIntro}</p>
@@ -19,7 +19,7 @@ export default function HomePage({ t }) {
         </div>
         <div className="hero-proof"><span><Check size={15} />{t.homeProofLocal}</span><span><Check size={15} />{t.homeProofPresets}</span></div>
       </div>
-      <aside className="hero-example" aria-label={t.homeExampleTitle}>
+      <aside className="hero-example col-lg-4" aria-label={t.homeExampleTitle}>
         <span className="example-label">{t.homeExampleTitle}</span>
         <div className="example-photo"><FileImage size={30} /></div>
         <strong>{t.homeExampleName}</strong>
@@ -28,8 +28,8 @@ export default function HomePage({ t }) {
       </aside>
     </section>
 
-    <div className="home-columns">
-      <div className="home-main">
+    <div className="home-columns row g-4">
+      <div className="home-main col-lg-9">
         <div id="exam-list" className="section-head home-section-head">
           <div><span className="eyebrow">{t.homeToolsEyebrow}</span><h2>{t.chooseExam}</h2><p>{t.notice}</p></div>
           <Link className="text-link" to="/tool/custom">{t.custom}<ArrowRight size={15} /></Link>
@@ -53,7 +53,7 @@ export default function HomePage({ t }) {
         </section>
         <AdSlot slot="tool-below" label={t.ad} />
       </div>
-      <aside className="home-sidebar"><AdSlot slot="sidebar-desktop" label={t.ad} /></aside>
+      <aside className="home-sidebar col-lg-3"><AdSlot slot="sidebar-desktop" label={t.ad} /></aside>
     </div>
   </main>;
 }

@@ -72,10 +72,9 @@ export default function PaymentButton({ plan, t, setUnlock, onSuccess, session, 
     }
   }
   return <div className="payment-action">
-    <button className={className} type="button" disabled={!enabled || busy} onClick={purchase}>
-      {busy ? t.paymentWorking : enabled ? t.payNow : accountsEnabled && !user ? t.signInToPay : t.paymentNotConfigured}
-    </button>
-    {accountsEnabled && !user && <Link className="account-prompt" to="/account">{t.signInTitle}</Link>}
+    {accountsEnabled && !user ? <Link className={`${className} payment-login-cta`} to="/account?next=%2Fpricing">{t.signInToPay}</Link> : <button className={className} type="button" disabled={!enabled || busy} onClick={purchase}>
+      {busy ? t.paymentWorking : enabled ? t.payNow : t.paymentNotConfigured}
+    </button>}
     {message && <p role="status" className="payment-message">{message}</p>}
     <UpiPayment price={config.prices[plan]} plan={plan} t={t} user={user} />
   </div>;
