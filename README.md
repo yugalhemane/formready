@@ -27,6 +27,12 @@ After successful test transactions, switch to approved Live Mode keys and set th
 
 Exam Pack is a one-time ₹49 purchase for 24 hours. Season Pass is a one-time ₹99 purchase for 60 days. A captured payment is verified against Razorpay before access is issued. A signed token is saved in the purchasing browser; there is no account or cross-device purchase recovery. The Shop Plan is not available to purchase while its multi-user features are unfinished.
 
+UPI QR payments are manual. Confirm the payment in your UPI merchant/bank app, then issue an access code using the server-only `PACK_TOKEN_SECRET`: `npm run access-code -- examPack <payment-reference>` or `npm run access-code -- seasonPass <payment-reference>`. The owner machine needs that same secret in ignored `.env.local` (for example, obtained with `vercel env pull .env.local`). Send the generated code to the buyer privately; they paste it into Exam Pack. Codes expire after the selected access period, but cannot be revoked or limited to one browser without adding a database. Never put `PACK_TOKEN_SECRET` in a `VITE_` variable or send it to a buyer.
+
+## Free use and abuse limits
+
+The single-file image tools are intentionally free and run entirely on the visitor's device. Refreshing, clearing browser storage, or using a private window cannot be reliably blocked by a static client-only site. Local storage counters are only a speed bump and are not payment security. Repeated one-file use does not consume FormReady server compute, so keep that path free and sell the convenience of multi-file processing, verified checklists, and ZIP download. If strict per-user quotas become necessary, add accounts and a server-side quota store; avoid sending private application files to a server unless the product and privacy promise are deliberately changed. Razorpay access is signed and checked server-side. Manually issued UPI codes are time-limited but shareable and cannot be revoked without a database.
+
 Update the domain, WhatsApp number, prices, and AdSense publisher ID in `site.config.json`. Copy `.env.example` to `.env.local` for local environment-variable names. Set optional GA4, AdSense, and ad-unit IDs in Vercel only if you intend to enable them. Consent still gates analytics and ads.
 
 ## Checks

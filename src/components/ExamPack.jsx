@@ -9,7 +9,7 @@ import { config } from '../config';
 
 const cleanNames = { photo: 'photo.jpg', signature: 'signature.jpg', thumb: 'thumb.jpg', declaration: 'declaration.jpg', certificate: 'certificate.pdf', income: 'certificate.pdf' };
 export default function ExamPack({ unlock, setUnlock, t }) {
-  const [message, setMessage] = useState(''), [exam, setExam] = useState('ibps'), [files, setFiles] = useState({}), [results, setResults] = useState({}), [crop, setCrop] = useState(null), [busy, setBusy] = useState(false), [zip, setZip] = useState(''), [plan, setPlan] = useState('examPack'), [access, setAccess] = useState(null), [checkingAccess, setCheckingAccess] = useState(Boolean(unlock?.token));
+  const [message, setMessage] = useState(''), [exam, setExam] = useState('ibps'), [files, setFiles] = useState({}), [results, setResults] = useState({}), [crop, setCrop] = useState(null), [busy, setBusy] = useState(false), [zip, setZip] = useState(''), [plan, setPlan] = useState('examPack'), [access, setAccess] = useState(null), [checkingAccess, setCheckingAccess] = useState(Boolean(unlock?.token)), [manualCode, setManualCode] = useState(''), [manualBusy, setManualBusy] = useState(false), [manualError, setManualError] = useState('');
   const p = presets.find(x => x.id === exam);
   useEffect(() => {
     let current = true;
@@ -22,6 +22,19 @@ export default function ExamPack({ unlock, setUnlock, t }) {
     return () => { current = false; };
   }, [unlock?.token, setUnlock]);
   const active = Boolean(access?.expiresAt > Date.now());
+  async function redeemManualCode(event) {
+    event.preventDefault();
+    if (!manualCode.trim() || manualBusy) return;
+    setManualBusy(true); setManualError('');
+    try {
+      const response = await fetch('/api/payments/access', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: manualCode.trim() }) });
+      const value = await response.json();
+      if (!response.ok) throw new Error(value.error || 'invalid');
+      localStorage.setItem('fr-unlock', JSON.stringify({ ...value, token: manualCode.trim() }));
+      setUnlock({ ...value, token: manualCode.trim() });
+    } catch { setManualError(t.manualCodeInvalid); }
+    finally { setManualBusy(false); }
+  }
   function docLabel(s) { return t[`doc_${s.id}`] || s.label; }
   async function processAll() {
     setBusy(true); setMessage(''); const next = {};
@@ -48,6 +61,12 @@ export default function ExamPack({ unlock, setUnlock, t }) {
       <h2>{t.unlockPack}</h2><p>{t.paymentIntro}</p>
       <label>{t.selectPlan}<select value={plan} onChange={e => setPlan(e.target.value)}><option value="examPack">{t.examPackPrice} — ₹{config.prices.examPack} · {t.dayAccess}</option><option value="seasonPass">{t.seasonPass} — ₹{config.prices.seasonPass} · {t.sixtyDay}</option></select></label>
       <PaymentButton plan={plan} t={t} setUnlock={setUnlock}/>
+      <form className="manual-code" onSubmit={redeemManualCode}>
+        <label htmlFor="manual-access-code">{t.manualCodeTitle}</label>
+        <input id="manual-access-code" value={manualCode} onChange={e => setManualCode(e.target.value)} autoComplete="off" spellCheck="false" placeholder={t.manualCodePlaceholder}/>
+        <button className="secondary" type="submit" disabled={!manualCode.trim() || manualBusy}>{manualBusy ? t.manualCodeChecking : t.manualCodeSubmit}</button>
+        {manualError && <p role="alert" className="error">{manualError}</p>}
+      </form>
       <small>{t.secureCheckoutNote}</small>
     </section> : <section className="card">
       <p className="pass">{t.paymentAccessUntil} {new Date(access.expiresAt).toLocaleString()}</p>
