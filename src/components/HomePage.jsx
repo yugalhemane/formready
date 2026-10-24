@@ -14,8 +14,8 @@ export default function HomePage({ t }) {
         <h1>{t.homeHeroTitle}</h1>
         <p>{t.homeIntro}</p>
         <div className="hero-actions">
-          <a className="primary" href="#exam-list">{t.homeStart}</a>
-          <Link className="secondary" to="/exam-pack"><Package size={16} />{t.homePackCta}</Link>
+          <a className="primary btn btn-warning" href="#exam-list">{t.homeStart}</a>
+          <Link className="secondary btn btn-outline-secondary" to="/exam-pack"><Package size={16} />{t.homePackCta}</Link>
         </div>
         <div className="hero-proof"><span><Check size={15} />{t.homeProofLocal}</span><span><Check size={15} />{t.homeProofPresets}</span></div>
       </div>
@@ -34,13 +34,13 @@ export default function HomePage({ t }) {
           <div><span className="eyebrow">{t.homeToolsEyebrow}</span><h2>{t.chooseExam}</h2><p>{t.notice}</p></div>
           <Link className="text-link" to="/tool/custom">{t.custom}<ArrowRight size={15} /></Link>
         </div>
-        <div className="grid">
-          {presets.map(p => <Link className="tool-card" key={p.id} to={'/tool/' + p.id}>
+        <div className="grid row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+          {presets.map(p => <Link className="tool-card col" key={p.id} to={'/tool/' + p.id}>
             <span className="iconbox"><FileImage /></span><span className="card-arrow"><ArrowRight /></span>
             <h3>{t[`preset_${p.id}`] || p.name}</h3>
             <p>{p.slots.length} {p.slots.length === 1 ? t.documentTypeOne : t.documentTypes}</p>
           </Link>)}
-          <Link className="tool-card" to="/tool/pdf"><span className="iconbox"><FileText /></span><span className="card-arrow"><ArrowRight /></span><h3>{t.pdfTools}</h3><p>{t.pdfDesc}</p></Link>
+          <Link className="tool-card col" to="/tool/pdf"><span className="iconbox"><FileText /></span><span className="card-arrow"><ArrowRight /></span><h3>{t.pdfTools}</h3><p>{t.pdfDesc}</p></Link>
         </div>
 
         <section className="value-section">

@@ -18,7 +18,7 @@ function loadCheckout() {
   return window.__formReadyCheckout;
 }
 
-export default function PaymentButton({ plan, t, setUnlock, onSuccess, className = 'primary' }) {
+export default function PaymentButton({ plan, t, setUnlock, onSuccess, className = 'primary btn btn-warning' }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const enabled = Boolean(import.meta.env.VITE_RAZORPAY_KEY_ID);
