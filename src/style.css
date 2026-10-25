@@ -63,3 +63,5 @@ body{min-height:100vh;color:var(--fr-text)}
 
 .brand-logo{display:block;flex:0 0 40px;width:40px;height:40px;object-fit:contain}.brand{gap:8px}
 @media(max-width:575px){.brand-logo{width:36px;height:36px;flex-basis:36px}}
+
+#root{min-height:100vh;display:flex;flex-direction:column}#root>main{flex:1 0 auto}#root>footer{margin-top:auto}

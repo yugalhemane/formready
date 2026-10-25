@@ -14,7 +14,7 @@ try {
   const failures = [], errors = [];
   for (const theme of ['light', 'dark']) for (const width of [360, 768, 1440]) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
-    await page.addInitScript(themeName => { localStorage.setItem('fr-lang', 'en'); localStorage.setItem('fr-tour-seen-v1', '1'); localStorage.setItem('fr-consent', 'declined'); localStorage.setItem('fr-theme', themeName); }, theme);
+    await page.addInitScript(themeName => { localStorage.setItem('fr-lang', 'en'); localStorage.setItem('fr-tour-seen-v1', '1'); localStorage.setItem('fr-consent', 'declined'); localStorage.setItem('fr-theme', themeName); window.__frThemeAtDomReady = null; document.addEventListener('DOMContentLoaded', () => { window.__frThemeAtDomReady = { theme: document.documentElement.dataset.theme, body: getComputedStyle(document.body).backgroundColor }; }, { once: true }); }, theme);
     page.on('pageerror', error => errors.push(`${theme} ${width}px ${page.url()}: ${error.message}`));
     for (const route of routes) {
       const response = await page.goto(`${origin}${route}`);
@@ -23,6 +23,7 @@ try {
       const title = await page.title(), h1 = await page.locator('main h1').first().textContent().catch(() => '');
       const meta = await page.locator('meta[name="description"]').getAttribute('content');
       const og = await page.locator('meta[property="og:title"]').getAttribute('content');
+      const firstTheme = await page.evaluate(() => window.__frThemeAtDomReady);
       const visual = await page.evaluate(() => {
         const rgb = value => value.match(/\d+/g)?.slice(0, 3).map(Number) || [];
         const root = getComputedStyle(document.documentElement).backgroundColor;
@@ -38,7 +39,11 @@ try {
         });
         return { root, body, isDark, minButtonContrast: buttons.length ? Math.min(...buttons.map(p=>p.contrast)) : null, buttons, overflow: document.documentElement.scrollWidth > innerWidth + 1 };
       });
-      if (!response?.ok() || !title || !h1?.trim() || !meta || !og || visual.overflow || (theme === 'dark' && !visual.isDark) || visual.minButtonContrast !== null && visual.minButtonContrast < 4.5) failures.push({ theme, width, route, status: response?.status(), title, h1, description: !!meta, og: !!og, ...visual });
+      if (!response?.ok() || !title || !h1?.trim() || !meta || !og || visual.overflow || firstTheme?.theme !== theme || (theme === 'dark' && (!visual.isDark || firstTheme?.body !== 'rgb(17, 24, 39)')) || visual.minButtonContrast !== null && visual.minButtonContrast < 4.5) failures.push({ theme, width, route, status: response?.status(), title, h1, description: !!meta, og: !!og, firstTheme, ...visual });
+      if (route === '/account') {
+        const footer = await page.evaluate(() => { const root=document.querySelector('#root').getBoundingClientRect(), end=document.querySelector('#root>footer').getBoundingClientRect(); return { display:getComputedStyle(document.querySelector('#root')).display, rootBottom:root.bottom, footerBottom:end.bottom, viewport:innerHeight }; });
+        if (footer.display !== 'flex' || footer.rootBottom < footer.viewport - 2 || footer.footerBottom < footer.viewport - 2 || footer.footerBottom < footer.rootBottom - 2) failures.push({ theme, width, route, footer });
+      }
       if (theme === 'dark' && route === '/pricing') {
         const cta = page.locator('.payment-login-cta').first();
         if (await cta.count() && await cta.getAttribute('href') !== '/account?next=%2Fpricing') failures.push({ theme, width, route, loginReturn: await cta.getAttribute('href') });
@@ -58,5 +63,5 @@ try {
     await page.close();
   }
   if (errors.length || failures.length) throw new Error(JSON.stringify({ errors, failures }, null, 2));
-  console.log(JSON.stringify({ routeCount: routes.length, themes: ['light', 'dark'], widths: [360, 768, 1440], directLoad: 'PASS', h1AndSeo: 'PASS', darkCanvas: 'PASS', allVisibleButtonContrast: '>=4.5:1', signedOutPurchaseRedirect: 'PASS', horizontalOverflow: 'none', pageErrors: errors }, null, 2));
+  console.log(JSON.stringify({ routeCount: routes.length, themes: ['light', 'dark'], widths: [360, 768, 1440], directLoad: 'PASS', h1AndSeo: 'PASS', initialThemeNoFlash: 'PASS', accountFooterBottom: 'PASS', allVisibleButtonContrast: '>=4.5:1', signedOutPurchaseRedirect: 'PASS', horizontalOverflow: 'none', pageErrors: errors }, null, 2));
 } finally { await browser?.close(); server.kill(); }
