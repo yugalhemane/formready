@@ -5,7 +5,7 @@ The app's account, payment history, entitlements, and owner dashboard use Supaba
 ## 1. Create the project and database tables
 
 1. Create a Supabase project and keep its database password in a password manager.
-2. Open **SQL Editor → New query** and run [`supabase/migrations/202610250001_account_entitlements.sql`](supabase/migrations/202610250001_account_entitlements.sql) in full.
+2. Open **SQL Editor → New query** and run [`supabase/migrations/202610250001_account_entitlements.sql`](supabase/migrations/202610250001_account_entitlements.sql) in full. It is safe to rerun: it replaces its named RLS policies and recreates its trigger/functions without deleting user or payment rows.
 3. In **Project Settings → API**, copy the Project URL and the publishable/anon key. Do not put a secret or service-role key in a `VITE_` variable.
 
 ## 2. Configure email sign-in

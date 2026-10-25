@@ -159,6 +159,13 @@ grant update (full_name) on public.profiles to authenticated;
 grant select on public.orders, public.entitlements to authenticated;
 grant all on public.profiles, public.orders, public.entitlements, public.webhook_events, public.admin_audit, public.api_rate_limits to service_role;
 
+-- Supabase SQL Editor users may rerun this migration after a partial/successful run.
+-- PostgreSQL has no CREATE POLICY IF NOT EXISTS, so replace the named policies safely.
+drop policy if exists "users read own profile" on public.profiles;
+drop policy if exists "users update own profile" on public.profiles;
+drop policy if exists "users read own orders" on public.orders;
+drop policy if exists "users read own entitlements" on public.entitlements;
+
 create policy "users read own profile" on public.profiles for select to authenticated using (auth.uid() = user_id);
 create policy "users update own profile" on public.profiles for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "users read own orders" on public.orders for select to authenticated using (auth.uid() = user_id);
