@@ -1,1 +1,1 @@
-# Configure adsensePublisherId in site.config.json after AdSense approval.
+google.com, ca-pub-4846574887585712, DIRECT, f08c47fec0942fa0

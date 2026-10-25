@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { accountAccessIsActive } from '../lib/accessHint';
+import { adsenseClient } from '../config';
 
 function legacyAccessIsActive() {
   try { return JSON.parse(localStorage.getItem('fr-unlock') || 'null')?.expiresAt > Date.now(); }
@@ -12,7 +13,7 @@ export default function AdSlot({ slot = 'tool-below', label = 'Advertisement' })
   const [paid, setPaid] = useState(() => accountAccessIsActive() || legacyAccessIsActive());
   const consent = localStorage.getItem('fr-consent');
   const unit = import.meta.env[`VITE_AD_SLOT_${slot.toUpperCase().replaceAll('-', '_')}`];
-  const client = import.meta.env.VITE_ADSENSE_CLIENT;
+  const client = adsenseClient;
   const enabled = consent === 'accepted' && !paid && pathname !== '/exam-pack' && client && unit;
   useEffect(() => {
     const update = () => setPaid(accountAccessIsActive() || legacyAccessIsActive());
