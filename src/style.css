@@ -65,3 +65,7 @@ body{min-height:100vh;color:var(--fr-text)}
 @media(max-width:575px){.brand-logo{width:36px;height:36px;flex-basis:36px}}
 
 #root{min-height:100vh;display:flex;flex-direction:column}#root>main{flex:1 0 auto}#root>footer{margin-top:auto}
+
+/* Reserve room for the fixed privacy choice banner so it never covers page controls. */
+body:has(.consent){padding-bottom:88px}
+@media(max-width:600px){body:has(.consent){padding-bottom:128px}}

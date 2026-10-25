@@ -8,6 +8,8 @@ export function AccountPage({ user, session, supabase, t }) {
   useEffect(() => {
     if (!user || !supabase) return;
     const fullName = String(user.user_metadata?.full_name || '').trim();
+    setName(fullName);
+    setEmail(user.email || '');
     if (fullName) supabase.from('profiles').update({ full_name: fullName }).eq('user_id', user.id);
     supabase.from('entitlements').select('plan,starts_at,expires_at,status').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data }) => setEntitlements(data || []));
     supabase.from('orders').select('plan,amount,currency,status,created_at,paid_at').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data }) => setOrders(data || []));
@@ -18,9 +20,24 @@ export function AccountPage({ user, session, supabase, t }) {
     const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { data: { full_name: name.trim() }, emailRedirectTo: `${window.location.origin}${params.get('next') || '/account'}` } });
     setMessage(error ? t.authSendError : t.authLinkSent); setBusy(false);
   }
+  async function updateProfile(event) {
+    event.preventDefault(); if (!supabase || !user || busy) return;
+    setBusy(true); setMessage('');
+    const fullName = name.trim();
+    const nextEmail = email.trim();
+    const { error: metadataError } = await supabase.auth.updateUser({ data: { ...user.user_metadata, full_name: fullName } });
+    if (metadataError) { setMessage(t.profileUpdateError); setBusy(false); return; }
+    const { error: profileError } = await supabase.from('profiles').update({ full_name: fullName }).eq('user_id', user.id);
+    if (profileError) { setMessage(t.profileUpdateError); setBusy(false); return; }
+    if (nextEmail && nextEmail.toLowerCase() !== (user.email || '').toLowerCase()) {
+      const { error } = await supabase.auth.updateUser({ email: nextEmail }, { emailRedirectTo: `${window.location.origin}/account` });
+      setMessage(error ? t.emailChangeError : t.emailChangeSent);
+    } else setMessage(t.profileSaved);
+    setBusy(false);
+  }
   if (!accountsEnabled) return <main className="account-page container"><section className="card"><h1>{t.accountTitle}</h1><p>{t.accountConfigMissing}</p></section></main>;
   if (!user) return <main className="account-page container"><section className="card"><h1>{t.signInTitle}</h1><p>{t.signInIntro}</p><form onSubmit={signIn} className="account-form"><label>{t.fullName}<input className="form-control" autoComplete="name" value={name} onChange={e => setName(e.target.value)} required/></label><label>{t.emailAddress}<input className="form-control" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required/></label><button className="primary btn btn-warning" disabled={busy}>{busy ? t.sendingLink : t.emailSignIn}</button></form>{message&&<p role="status">{message}</p>}</section></main>;
-  return <main className="account-page container"><section className="card"><div className="account-heading"><div><span className="eyebrow">{t.accountTitle}</span><h1>{user.user_metadata?.full_name || user.email}</h1><p>{user.email}</p></div><button className="secondary btn btn-outline-secondary" onClick={() => supabase.auth.signOut()}>{t.signOut}</button></div><h2>{t.yourAccess}</h2>{entitlements.length ? entitlements.map((item,i)=><p className="account-record" key={`${item.plan}-${item.starts_at}-${i}`}>{item.plan === 'seasonPass' ? t.seasonPass : t.examPack} · {item.status} · {t.expiresAt} {new Date(item.expires_at).toLocaleString()}</p>) : <p>{t.noAccess}</p>}<h2>{t.paymentHistory}</h2>{orders.length ? orders.map((item,i)=><p className="account-record" key={`${item.created_at}-${i}`}>{item.plan} · ₹{(item.amount/100).toFixed(0)} · {item.status} · {new Date(item.created_at).toLocaleDateString()}</p>) : <p>{t.noPayments}</p>}<Link className="secondary btn btn-outline-secondary" to="/exam-pack">{t.openExamPack}</Link></section></main>;
+  return <main className="account-page container"><section className="card"><div className="account-heading"><div><span className="eyebrow">{t.accountTitle}</span><h1>{user.user_metadata?.full_name || user.email}</h1><p>{user.email}</p></div><button className="secondary btn btn-outline-secondary" onClick={() => supabase.auth.signOut()}>{t.signOut}</button></div><form className="account-form" onSubmit={updateProfile}><h2>{t.profileSettings}</h2><label>{t.fullName}<input className="form-control" autoComplete="name" value={name} onChange={e=>setName(e.target.value)} required/></label><label>{t.emailAddress}<input className="form-control" type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label><button className="primary btn btn-warning" disabled={busy}>{busy?t.savingProfile:t.saveProfile}</button>{message&&<p role="status">{message}</p>}</form><h2>{t.yourAccess}</h2>{entitlements.length ? entitlements.map((item,i)=><p className="account-record" key={`${item.plan}-${item.starts_at}-${i}`}>{item.plan === 'seasonPass' ? t.seasonPass : t.examPack} · {item.status} · {t.expiresAt} {new Date(item.expires_at).toLocaleString()}</p>) : <p>{t.noAccess}</p>}<h2>{t.paymentHistory}</h2>{orders.length ? orders.map((item,i)=><p className="account-record" key={`${item.created_at}-${i}`}>{item.plan} · ₹{(item.amount/100).toFixed(0)} · {item.status} · {new Date(item.created_at).toLocaleDateString()}</p>) : <p>{t.noPayments}</p>}<Link className="secondary btn btn-outline-secondary" to="/exam-pack">{t.openExamPack}</Link></section></main>;
 }
 
 export function AdminPage({ user, session, t }) {
