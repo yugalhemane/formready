@@ -58,3 +58,8 @@ body{min-height:100vh;color:var(--fr-text)}
 :root[data-theme=dark] .secondary{background:#1f2937!important;color:#f1f5f9!important;border-color:#64748b!important}
 :root[data-theme=dark] button.primary.btn.btn-warning:disabled,:root[data-theme=dark] a.primary.btn.btn-warning.disabled{--bs-btn-disabled-bg:#8b5b27;--bs-btn-disabled-color:#fff;--bs-btn-disabled-border-color:#8b5b27;background:#8b5b27!important;border-color:#8b5b27!important;color:#fff!important;opacity:1!important}
 :root:not([data-theme=dark]) button.primary.btn.btn-warning:disabled,:root:not([data-theme=dark]) a.primary.btn.btn-warning.disabled{--bs-btn-disabled-bg:#d6a05e;--bs-btn-disabled-color:#35210c;--bs-btn-disabled-border-color:#d6a05e;background:#d6a05e!important;border-color:#d6a05e!important;color:#35210c!important;opacity:1!important}
+
+.consent button{background:#b45309;color:#fff}.consent button:hover{background:#92400e}
+
+.brand-logo{display:block;flex:0 0 40px;width:40px;height:40px;object-fit:contain}.brand{gap:8px}
+@media(max-width:575px){.brand-logo{width:36px;height:36px;flex-basis:36px}}
