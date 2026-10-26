@@ -8,6 +8,7 @@ import webhookHandler from '../api/payments/webhook.js';
 import adminUsersHandler from '../api/admin/users.js';
 import adminEntitlementsHandler from '../api/admin/entitlements.js';
 import adminAuditHandler from '../api/admin/audit.js';
+import { db } from '../api/payments/_account.js';
 
 process.env.RAZORPAY_KEY_ID = 'rzp_test_accounts';
 process.env.RAZORPAY_KEY_SECRET = 'razorpay-test-secret';
@@ -71,6 +72,18 @@ test('account access is read from a live database entitlement', async () => {
   };
   const res=response(); await accessHandler({method:'POST',headers:authHeader,body:{}},res);
   assert.equal(res.statusCode,200); assert.equal(res.data.plan,'seasonPass');
+});
+
+test('new Supabase secret API keys are sent as apikey, never as bearer JWTs', async () => {
+  process.env.SUPABASE_SECRET_KEY = 'sb_secret_test_backend_key';
+  globalThis.fetch = async (url, options = {}) => {
+    assert.match(String(url), /\/rest\/v1\/health-check/);
+    assert.equal(options.headers.apikey, 'sb_secret_test_backend_key');
+    assert.equal(options.headers.Authorization, undefined);
+    return new Response('[]');
+  };
+  await db('health-check');
+  process.env.SUPABASE_SECRET_KEY = 'test-server-secret';
 });
 
 test('signed captured-payment webhook finalizes a browser-abandoned order and rejects bad signatures', async () => {

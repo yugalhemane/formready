@@ -23,10 +23,14 @@ export async function authenticate(req) {
 
 export async function db(path, options = {}) {
   if (!base() || !secret()) throw new Error('supabase_not_configured');
+  const key = secret();
+  // Supabase's new sb_secret_* API keys are not JWTs. Send them only via
+  // apikey; legacy service_role keys are JWTs and also act as the bearer role.
+  const authorization = key.startsWith('sb_secret_') ? {} : { Authorization: `Bearer ${key}` };
   const response = await fetch(`${base()}/rest/v1/${path}`, {
     ...options,
     headers: {
-      apikey: secret(), Authorization: `Bearer ${secret()}`,
+      apikey: key, ...authorization,
       'Content-Type': 'application/json', ...options.headers,
     },
     signal: AbortSignal.timeout(10000),
