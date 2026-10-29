@@ -6,6 +6,7 @@ export default async function handler(req, res) {
   const plan = req.body?.plan;
   const product = productFor(plan);
   if (!product) return reply(res, 400, { error: 'invalid_plan' });
+  if (product.amount < 100) return reply(res, 400, { error: 'amount_below_minimum' });
   let user = null;
   if (accountsRequested()) {
     if (!accountConfigured()) return reply(res, 503, { error: 'accounts_not_configured' });
@@ -34,6 +35,6 @@ export default async function handler(req, res) {
       description: product.label,
     });
   } catch {
-    return reply(res, 502, { error: 'order_creation_failed' });
+    return reply(res, 500, { error: 'order_creation_failed' });
   }
 }

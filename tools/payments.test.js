@@ -61,6 +61,14 @@ test('order creation ignores client prices and uses the server catalog', async (
   assert.equal(invalid.statusCode, 400);
 });
 
+test('order creation returns a server error when Razorpay rejects the order request', async () => {
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: { description: 'test failure' } }), { status: 401 });
+  const res = response();
+  await orderHandler({ method: 'POST', body: { plan: 'examPack' } }, res);
+  assert.equal(res.statusCode, 500);
+  assert.equal(res.data.error, 'order_creation_failed');
+});
+
 test('an old captured payment cannot mint fresh access by replaying its callback', () => {
   const createdAt = Math.floor((Date.now() - 25 * 60 * 60 * 1000) / 1000);
   assert.equal(newEntitlement('examPack', 'pay_replayed', createdAt), null);
