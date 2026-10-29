@@ -57,8 +57,8 @@ export default function CropDialog({ file, aspect, onCancel, onApply, t }) {
       <h2 id="crop-title">{t.adjustCrop}</h2>
       {error ? <p className="error" role="alert">{error}</p> : <>
         <div className="crop-viewport">{url && <Cropper image={url} crop={crop} zoom={zoom} rotation={rotation} aspect={aspect} onCropChange={setCrop} onZoomChange={setZoom} onRotationChange={setRotation} onCropComplete={(_, pixels) => setArea(pixels)} />}</div>
-        <label>{t.zoom}<input className="form-range" aria-label={t.zoom} type="range" min="1" max="4" step="0.01" value={zoom} onChange={e => setZoom(+e.target.value)} /></label>
-        <label>{t.rotate}<input className="form-range" aria-label={t.rotate} type="range" min="-180" max="180" step="1" value={rotation} onChange={e => setRotation(+e.target.value)} /> <output>{rotation}°</output></label>
+        <label>{t.zoom}<input id="crop-zoom" name="zoom" className="form-range" aria-label={t.zoom} type="range" min="1" max="4" step="0.01" value={zoom} onChange={e => setZoom(+e.target.value)} /></label>
+        <label>{t.rotate}<input id="crop-rotation" name="rotation" className="form-range" aria-label={t.rotate} type="range" min="-180" max="180" step="1" value={rotation} onChange={e => setRotation(+e.target.value)} /> <output>{rotation}°</output></label>
       </>}
       <div className="crop-actions"><button className="secondary btn btn-outline-secondary" onClick={onCancel}>{t.cancel}</button><button className="primary btn btn-warning" disabled={!area || !!error} onClick={apply}>{t.useCrop}</button></div>
     </section>

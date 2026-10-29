@@ -20,14 +20,14 @@ export default function CroppableTool({ t, spec }) {
   return <div className="workbench">
     <section className="card shadow-sm"><h2>{t.chooseFile}</h2><div className="drop selected-file-box" onClick={() => !file && picker.current?.click()}>
       {file ? <FilePreview file={file} large t={t}/> : <><Upload/><strong>{t.drop}</strong><span>{t.supportedImageTypes}</span></>}
-      <input ref={picker} className="file-input" aria-label={t.chooseFile} type="file" accept="image/*,.heic,.heif" onChange={e => select(e.target.files?.[0])}/>
+      <input ref={picker} id="image-upload" name="image" className="file-input" aria-label={t.chooseFile} type="file" accept="image/*,.heic,.heif" onChange={e => select(e.target.files?.[0])}/>
     </div>
     {file && <div className="file-actions">
       <button type="button" className="secondary btn btn-outline-secondary" onClick={() => setCrop(true)}>{t.cropRotate}</button>
       <button type="button" className="secondary btn btn-outline-secondary" onClick={() => picker.current?.click()}>{t.fileReplace}</button>
       <button type="button" className="secondary btn btn-outline-secondary" onClick={() => { setFile(null); setResult(null); setError(''); if (picker.current) picker.current.value = ''; }}>{t.fileRemove}</button>
     </div>}
-    </section><section className="card shadow-sm settings"><h2>{t.outputRequirements}</h2>{!spec&&<div className="form-grid">{[[t.width,w,setW],[t.height,h,setH],[t.minKB,min,setMin],[t.maxKB,max,setMax]].map(([label,value,set])=><label key={label}>{label}<input className="form-control" aria-label={label} type="number" min="1" value={value} onChange={e=>set(e.target.value)}/></label>)}</div>}<p>{w} × {h} px · {min}–{max} KB</p><button className="primary btn btn-warning" disabled={!file||busy||+w<=0||+h<=0||+min<=0||+max<+min} onClick={process}>{busy?t.processing:t.make}</button>{error&&<p className="error" role="alert">{error}</p>}</section>
+    </section><section className="card shadow-sm settings"><h2>{t.outputRequirements}</h2>{!spec&&<div className="form-grid">{[['width',t.width,w,setW],['height',t.height,h,setH],['min-kb',t.minKB,min,setMin],['max-kb',t.maxKB,max,setMax]].map(([key,label,value,set])=><label key={key}>{label}<input id={`custom-${key}`} name={key} className="form-control" aria-label={label} type="number" min="1" value={value} onChange={e=>set(e.target.value)}/></label>)}</div>}<p>{w} × {h} px · {min}–{max} KB</p><button className="primary btn btn-warning" disabled={!file||busy||+w<=0||+h<=0||+min<=0||+max<+min} onClick={process}>{busy?t.processing:t.make}</button>{error&&<p className="error" role="alert">{error}</p>}</section>
     {result&&<section className="card shadow-sm result"><h2>{t.yourFile}</h2><div className="preview"><img src={result.url} alt={t.yourFile}/><div><span className={result.pass?'pass':'error'}><Check/>{result.pass?t.pass:t.failed}</span><p>{result.width} × {result.height} px</p><p>{result.kb.toFixed(1)} KB</p></div></div><a className="primary btn btn-warning" href={result.url} download="photo.jpg">{t.downloadJpg}</a></section>}
     {crop&&file&&<CropDialog file={file} aspect={+w/+h} t={t} onCancel={()=>setCrop(false)} onApply={b=>{setFile(new File([b],file.name.replace(/\.[^.]+$/,'')+'-cropped.jpg',{type:'image/jpeg'}));setCrop(false);setResult(null)}}/>}
   </div>;

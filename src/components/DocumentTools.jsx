@@ -44,10 +44,10 @@ export default function DocumentTools({ t, target = 200 }) {
     </div>
     <h2>{t[`documentTool_${mode}`]}</h2><p>{t[`documentToolHelp_${mode}`]}</p>
     <label className="document-file-picker">{t[mode === 'compress' ? 'chooseFile' : mode === 'merge' ? 'choosePdfs' : 'chooseImages']}
-      <input className="form-control" type="file" multiple={mode !== 'compress'} accept={accept} onChange={e => { const selected = Array.from(e.target.files || []); setResult(null); setError(''); if (mode === 'compress') setPdf(selected[0] || null); else if (mode === 'merge') setPdfs(selected); else setImages(selected); }}/>
+      <input id="document-files" name="files" className="form-control" type="file" multiple={mode !== 'compress'} accept={accept} onChange={e => { const selected = Array.from(e.target.files || []); setResult(null); setError(''); if (mode === 'compress') setPdf(selected[0] || null); else if (mode === 'merge') setPdfs(selected); else setImages(selected); }}/>
     </label>
     {files.length > 0 && <ul className="document-file-list">{files.map((file, index) => <li key={`${file.name}-${index}`}><span>{file.name}</span><small>{(file.size / 1024).toFixed(1)} KB</small></li>)}</ul>}
-    {mode === 'compress' && <label>{t.targetSize}<input className="form-control" type="number" min="1" value={kb} onChange={e => setKb(e.target.value)}/></label>}
+    {mode === 'compress' && <label>{t.targetSize}<input id="document-target-kb" name="targetKb" className="form-control" type="number" min="1" value={kb} onChange={e => setKb(e.target.value)}/></label>}
     <button className="primary btn btn-warning" disabled={!required || busy} onClick={run}>{busy ? t.processing : t[`documentToolRun_${mode}`]}</button>
     {error && <p className="error" role="alert">{error}</p>}
     {result && <div className="document-result"><p className={result.pass ? 'pass' : 'error'}>{mode === 'compress' && <>{t.before} {result.originalKB.toFixed(1)} KB → </>}{t.after} {result.kb.toFixed(1)} KB{mode === 'compress' && !result.pass ? ` · ${t.targetWas} ${kb} KB` : ''}</p><a className="primary btn btn-warning" href={URL.createObjectURL(result.blob)} download={mode === 'compress' ? 'compressed.pdf' : mode === 'merge' ? 'merged.pdf' : 'images.pdf'}>{t.download}</a></div>}
